@@ -1,6 +1,8 @@
 import { AuthModule } from '@modules//auth/auth.module';
+import { CvModule } from '@modules/cv/cv.module';
 import { FileModule } from '@modules/file/file.module';
 import { HealthModule } from '@modules/health/health.module';
+import { LlmModule } from '@modules/llm/llm.module';
 import { PermissionModule } from '@modules/permission/permission.module';
 import { RoleModule } from '@modules/role/role.module';
 import { SessionModule } from '@modules/session/session.module';
@@ -24,6 +26,8 @@ const modulesGenerate = generateModulesSet();
     PermissionModule,
     SharedModule,
     FileModule,
+    CvModule,
+    LlmModule,
   ],
 })
 export class AppModule {}
