@@ -11,4 +11,8 @@ export class OpenAIStrategy implements LLMProvider {
     });
     return response.choices[0].message.content || '';
   }
+
+  async praseCv(prompt: string): Promise<string> {
+    return prompt;
+  }
 }

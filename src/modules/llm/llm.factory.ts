@@ -1,4 +1,5 @@
 import { LLMProvider } from './interfaces/llm.interface';
+import { GroqStrategy } from './providers/groq.strategy';
 import { OpenAIStrategy } from './providers/openai.strategy';
 
 export class LLMFactory {
@@ -6,8 +7,8 @@ export class LLMFactory {
     switch (provider) {
       case 'openai':
         return new OpenAIStrategy();
-      // case 'azure':
-      //   return new AzureOpenAIStrategy();
+      case 'groq':
+        return new GroqStrategy();
       default:
         throw new Error(`Unsupported LLM provider: ${provider}`);
     }

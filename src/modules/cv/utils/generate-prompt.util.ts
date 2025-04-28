@@ -1,7 +1,5 @@
 export const generatePrompt = (cvText: string): string => {
   return `
-    You are an AI assistant that extracts structured information from a candidate's CV.
-
 Given the following raw text from a CV, extract and return a JSON object with the following fields:
 - fullName
 - email

@@ -8,14 +8,20 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { LlmService } from '../llm/llm.service';
 import { CvService } from './cv.service';
 import { generatePrompt } from './utils/generate-prompt.util';
 
 @Controller({ path: 'cv', version: '1' })
+@ApiTags('CV APIs')
 export class CvController {
-  constructor(private readonly cvService: CvService) {}
+  constructor(
+    private readonly cvService: CvService,
+    private readonly llmService: LlmService,
+  ) {}
 
   @ApiPublic({
     summary: 'Upload file',
@@ -41,6 +47,7 @@ export class CvController {
       fileName: file.originalname,
       textPreview: cvText,
       prompt,
+      result: await this.llmService.extractCVInfo(cvText),
     };
   }
 }
