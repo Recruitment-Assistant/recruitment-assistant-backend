@@ -1,8 +1,8 @@
 {
-  "name": "nest_boilerplate",
+  "name": "recruitment_assistant",
   "version": "0.0.1",
-  "description": "Nestjs boiler plate",
-  "author": "nest_boilerplate",
+  "description": "Recruitment Assistant APIs",
+  "author": "recruitment_assistant",
   "private": true,
   "license": "MIT",
   "scripts": {

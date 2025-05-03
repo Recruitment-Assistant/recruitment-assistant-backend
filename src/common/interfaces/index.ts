@@ -6,4 +6,7 @@ export interface ICurrentUser {
   roles: ROLE[];
   sessionId?: Uuid;
   permissions: string[];
+  name: string;
+  avatar?: string;
+  email: string;
 }

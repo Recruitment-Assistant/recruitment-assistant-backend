@@ -8,3 +8,14 @@ export enum GENDER {
   MALE = 0,
   FEMALE = 1,
 }
+
+export enum ROLE_SCOPE {
+  SYSTEM = 'SYSTEM',
+  ORGANIZATION = 'ORGANIZATION',
+}
+
+export enum ORGANIZATION_ROLE {
+  HR_ADMIN = 'HR_ADMIN',
+  HR_STAFF = 'HR_STAFF',
+  INTERVIEWER = 'INTERVIEWER',
+}

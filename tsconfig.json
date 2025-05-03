@@ -1,8 +1,6 @@
 {
   "ts-node": {
-    "require": [
-      "tsconfig-paths/register"
-    ]
+    "require": ["tsconfig-paths/register"]
     // configuration for typeorm migration
   },
   "compilerOptions": {
@@ -26,36 +24,17 @@
     "esModuleInterop": true,
     "importHelpers": true,
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@common/*": [
-        "src/common/*"
-      ],
-      "@config/*": [
-        "src/config/*"
-      ],
-      "@database/*": [
-        "src/database/*"
-      ],
-      "@generated/*": [
-        "src/generated/*"
-      ],
-      "@i18n/*": [
-        "src/i18n/*"
-      ],
-      "@libs/*": [
-        "src/libs/*"
-      ],
-      "@mail/*": [
-        "src/mail/*"
-      ],
-      "@modules/*": [
-        "src/modules/*"
-      ],
-      "@shared/*": [
-        "src/shared/*"
-      ]
+      "@/*": ["src/*"],
+      "@common/*": ["src/common/*"],
+      "@config/*": ["src/config/*"],
+      "@core/*": ["src/core/*"],
+      "@database/*": ["src/database/*"],
+      "@generated/*": ["src/generated/*"],
+      "@i18n/*": ["src/i18n/*"],
+      "@libs/*": ["src/libs/*"],
+      "@mail/*": ["src/mail/*"],
+      "@modules/*": ["src/modules/*"],
+      "@shared/*": ["src/shared/*"]
     }
   }
 }

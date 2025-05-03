@@ -272,6 +272,9 @@ export class AuthService {
       sessionId: session.id,
       hash: newHash,
       roles: user.roles.map((role) => role.name),
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
     });
 
     return plainToInstance(LoginResDto, {

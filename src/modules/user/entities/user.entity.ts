@@ -1,3 +1,4 @@
+import { UserOrganizationEntity } from '@/modules/organization/entities/user-organization.entity';
 import { GENDER } from '@common/constants/entity.enum';
 import { Uuid } from '@common/types/common.type';
 import { hashPassword as hashPass } from '@common/utils/password.util';
@@ -73,6 +74,9 @@ export class UserEntity extends AbstractEntity {
   sessions?: SessionEntity[];
 
   permissions?: Partial<PermissionEntity>[];
+
+  @OneToMany(() => UserOrganizationEntity, (userOrg) => userOrg.user)
+  userOrganizations?: UserOrganizationEntity[];
 
   @BeforeInsert()
   @BeforeUpdate()

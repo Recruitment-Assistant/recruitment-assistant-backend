@@ -49,6 +49,9 @@ export class JwtUtil {
     sessionId: string;
     hash: string;
     roles: string[];
+    name: string;
+    email: string;
+    avatar?: string;
   }): Promise<Token> {
     const tokenExpiresIn = this.configService.getOrThrow('auth.expires', {
       infer: true,
@@ -61,6 +64,9 @@ export class JwtUtil {
           id: data.id,
           roles: data.roles,
           sessionId: data.sessionId,
+          name: data.name,
+          email: data.email,
+          avatar: data.avatar,
         },
         {
           secret: this.configService.getOrThrow('auth.secret', { infer: true }),
