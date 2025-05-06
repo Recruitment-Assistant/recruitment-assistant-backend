@@ -9,4 +9,5 @@ export interface ICurrentUser {
   name: string;
   avatar?: string;
   email: string;
+  currentOrganizationId?: Uuid;
 }

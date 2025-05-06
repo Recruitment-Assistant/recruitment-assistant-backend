@@ -1,4 +1,3 @@
-import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { ApiAuth, ApiPublic } from '@common/decorators/http.decorators';
 import { ICurrentUser } from '@common/interfaces';
 import { ConfirmEmailReqDto } from '@modules/auth/dto/request/confirm-email.req.dto';
@@ -21,9 +20,11 @@ import { AuthService } from '../auth.service';
 import { LoginReqDto } from '../dto/request/login.req.dto';
 import { RefreshReqDto } from '../dto/request/refresh.req.dto';
 import { RegisterReqDto } from '../dto/request/register.req.dto';
+import { SelectOrgDto } from '../dto/request/select-org.dto';
 import { LoginResDto } from '../dto/response/login.res.dto';
 import { RefreshResDto } from '../dto/response/refresh.res.dto';
 import { RegisterResDto } from '../dto/response/register.res.dto';
+import { CurrentUser } from './../../../common/decorators/current-user.decorator';
 
 @ApiTags('Auth APIs')
 @Controller({
@@ -140,5 +141,21 @@ export class AuthController {
   @Delete('revoke-token')
   revokeToken(@CurrentUser() user: ICurrentUser) {
     return this.authService.revokeTokens(user);
+  }
+
+  @Post('select-organization')
+  @ApiAuth({
+    summary: 'Select a organization',
+    statusCode: HttpStatus.OK,
+    type: LoginResDto,
+  })
+  selectOrganization(
+    @CurrentUser() user: ICurrentUser,
+    @Body() selectOrgDto: SelectOrgDto,
+  ) {
+    return this.authService.selectOrganizationAndGenerateToken(
+      user,
+      selectOrgDto.organizationId,
+    );
   }
 }

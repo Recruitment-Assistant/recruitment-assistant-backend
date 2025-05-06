@@ -23,6 +23,7 @@ import { OrganizationMemberResDto } from './dto/response/organization-member.res
 import { OrganizationResDto } from './dto/response/organization.res.dto';
 import { OrganizationMapper } from './mappers/organization.mapper';
 import { UserOrganizationMapper } from './mappers/user-organization.mapper';
+import { OrganizationService } from './organization.service';
 import { AddOrganizationMemberUseCase } from './use-cases/add-organization-member.use-case';
 import { GetMyOrganizationsUseCase } from './use-cases/get-my-organizations.use-case';
 import { GetOrganizationByIdUseCase } from './use-cases/get-organization-by-id.use-case';
@@ -41,6 +42,7 @@ export class OrganizationController {
     private readonly addMemberUseCase: AddOrganizationMemberUseCase,
     private readonly removeMemberUseCase: RemoveOrganizationMemberUseCase,
     private readonly getOrganizationMembersUseCase: GetOrganizationMembersUseCase,
+    private readonly organizationService: OrganizationService,
   ) {}
 
   @Post()

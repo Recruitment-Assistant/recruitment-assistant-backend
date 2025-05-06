@@ -22,6 +22,7 @@ import { HttpService } from '@nestjs/axios';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -32,6 +33,7 @@ import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ICurrentUser } from 'src/common/interfaces';
+import { OrganizationService } from '../organization/organization.service';
 import { LoginReqDto } from './dto/request/login.req.dto';
 import { RefreshReqDto } from './dto/request/refresh.req.dto';
 import { RegisterReqDto } from './dto/request/register.req.dto';
@@ -49,6 +51,7 @@ export class AuthService {
     private readonly httpService: HttpService,
     @Inject(CACHE_MANAGER)
     private readonly cacheService: Cache,
+    private readonly organizationService: OrganizationService,
   ) {}
 
   async signIn(
@@ -275,6 +278,37 @@ export class AuthService {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
+    });
+
+    return plainToInstance(LoginResDto, {
+      userId: user.id,
+      ...token,
+    });
+  }
+
+  async selectOrganizationAndGenerateToken(user: ICurrentUser, orgId: Uuid) {
+    const isMember = await this.organizationService.isUserMemberOfOrganization(
+      user.id,
+      orgId,
+    );
+    if (!isMember) {
+      throw new ForbiddenException('You are not a member of this organization');
+    }
+
+    const newHash = CommonFunction.generateHashInToken();
+    await this.sessionService.update(user.sessionId, {
+      hash: newHash,
+    });
+
+    const token = await this.jwtUtil.createToken({
+      id: user.id,
+      sessionId: user.sessionId,
+      hash: newHash,
+      roles: user.roles,
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+      currentOrganizationId: orgId,
     });
 
     return plainToInstance(LoginResDto, {

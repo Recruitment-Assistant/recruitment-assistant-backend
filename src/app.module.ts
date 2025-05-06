@@ -5,6 +5,7 @@ import { HealthModule } from '@modules/health/health.module';
 import { LlmModule } from '@modules/llm/llm.module';
 import { OrganizationModule } from '@modules/organization/organization.module';
 import { PermissionModule } from '@modules/permission/permission.module';
+import { PositionModule } from '@modules/position/presentation/position.module';
 import { RoleModule } from '@modules/role/role.module';
 import { SessionModule } from '@modules/session/session.module';
 import { UserModule } from '@modules/user/user.module';
@@ -30,6 +31,7 @@ const modulesGenerate = generateModulesSet();
     CvModule,
     LlmModule,
     OrganizationModule,
+    PositionModule,
   ],
 })
 export class AppModule {}

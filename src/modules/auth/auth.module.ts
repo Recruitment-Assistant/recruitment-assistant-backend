@@ -4,11 +4,18 @@ import { SessionModule } from '@modules/session/session.module';
 import { UserModule } from '@modules/user/user.module';
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
+import { OrganizationModule } from '../organization/organization.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './controllers/auth.controller';
 
 @Module({
-  imports: [UserModule, SessionModule, CommonModule, HttpModule.register({})],
+  imports: [
+    UserModule,
+    SessionModule,
+    CommonModule,
+    HttpModule.register({}),
+    OrganizationModule,
+  ],
   controllers: [AuthController, AdminAuthController],
   providers: [AuthService],
 })

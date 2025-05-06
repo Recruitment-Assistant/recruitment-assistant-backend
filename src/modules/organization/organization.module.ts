@@ -33,5 +33,6 @@ const providers = [
   ],
   controllers: [OrganizationController],
   providers,
+  exports: [OrganizationService],
 })
 export class OrganizationModule {}
