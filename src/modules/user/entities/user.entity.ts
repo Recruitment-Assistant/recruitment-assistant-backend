@@ -16,6 +16,7 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
 } from 'typeorm';
 
 @Entity('user', { schema: 'public' })
@@ -76,7 +77,7 @@ export class UserEntity extends AbstractEntity {
   permissions?: Partial<PermissionEntity>[];
 
   @OneToMany(() => UserOrganizationEntity, (userOrg) => userOrg.user)
-  userOrganizations?: UserOrganizationEntity[];
+  userOrganizations?: Relation<UserOrganizationEntity>[];
 
   @BeforeInsert()
   @BeforeUpdate()

@@ -26,5 +26,6 @@ const providers: Provider[] = [
   imports: [TypeOrmModule.forFeature([PositionEntity])],
   controllers: [PositionController],
   providers,
+  exports: [POSITION_REPOSITORY],
 })
 export class PositionModule {}

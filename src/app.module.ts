@@ -1,5 +1,7 @@
+import { JobModule } from '@/modules/job/presentation/job.module';
 import { AuthModule } from '@modules//auth/auth.module';
 import { CvModule } from '@modules/cv/cv.module';
+import { DepartmentModule } from '@modules/department/presentation/department.module';
 import { FileModule } from '@modules/file/file.module';
 import { HealthModule } from '@modules/health/health.module';
 import { LlmModule } from '@modules/llm/llm.module';
@@ -32,6 +34,8 @@ const modulesGenerate = generateModulesSet();
     LlmModule,
     OrganizationModule,
     PositionModule,
+    JobModule,
+    DepartmentModule,
   ],
 })
 export class AppModule {}

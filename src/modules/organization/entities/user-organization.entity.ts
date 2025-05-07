@@ -58,5 +58,5 @@ export class UserOrganizationEntity extends AbstractEntity {
     referencedColumnName: 'id',
     foreignKeyConstraintName: 'FK_user_organization_organization_id',
   })
-  organization!: OrganizationEntity;
+  organization!: Relation<OrganizationEntity>;
 }

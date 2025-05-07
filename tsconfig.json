@@ -24,7 +24,6 @@
     "esModuleInterop": true,
     "importHelpers": true,
     "paths": {
-      "@/*": ["src/*"],
       "@common/*": ["src/common/*"],
       "@config/*": ["src/config/*"],
       "@core/*": ["src/core/*"],
@@ -32,9 +31,9 @@
       "@generated/*": ["src/generated/*"],
       "@i18n/*": ["src/i18n/*"],
       "@libs/*": ["src/libs/*"],
-      "@mail/*": ["src/mail/*"],
       "@modules/*": ["src/modules/*"],
-      "@shared/*": ["src/shared/*"]
+      "@shared/*": ["src/shared/*"],
+      "@/*": ["src/*"]
     }
   }
 }
