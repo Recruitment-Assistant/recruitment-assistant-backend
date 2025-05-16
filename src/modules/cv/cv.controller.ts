@@ -1,26 +1,38 @@
 import { ApiPublic } from '@/common/decorators/http.decorators';
 import { UploadFileDecorator } from '@/common/decorators/upload-file.decorator';
-import { extractTextFromPDF } from '@/common/utils/pdf.util';
+import { ErrorCode } from '@common/constants/error-code';
+import { ValidationException } from '@common/exceptions/validation.exception';
+import {
+  RESUME_ANALYZER_PORT,
+  RESUME_PARSER_PORT,
+} from '@modules/application/constants';
+import { JD_TEXT } from '@modules/application/constants/prompt-analysis-resume.constant';
+import { ResumeAnalyzerPort } from '@modules/application/ports/resume-analyzer.port';
+import { ResumeParserPort } from '@modules/application/ports/resume-parser.port';
 import {
   Controller,
+  Inject,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
+import * as fs from 'fs';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { LlmService } from '../llm/llm.service';
+import path, { extname } from 'path';
+import PdfParse from 'pdf-parse';
 import { CvService } from './cv.service';
-import { generatePrompt } from './utils/generate-prompt.util';
 
 @Controller({ path: 'cv', version: '1' })
 @ApiTags('CV APIs')
 export class CvController {
   constructor(
     private readonly cvService: CvService,
-    private readonly llmService: LlmService,
+    @Inject(RESUME_PARSER_PORT)
+    private readonly parser: ResumeParserPort,
+    @Inject(RESUME_ANALYZER_PORT)
+    private readonly analyzer: ResumeAnalyzerPort,
   ) {}
 
   @ApiPublic({
@@ -38,16 +50,28 @@ export class CvController {
           cb(null, uniqueSuffix + extname(file.originalname));
         },
       }),
+      fileFilter: (req, file, cb) => {
+        if (
+          !['.pdf'].includes(
+            path.extname(file.originalname).toLocaleLowerCase(),
+          )
+        ) {
+          cb(
+            new ValidationException(ErrorCode.COMMON, 'Only support pdf file'),
+            false,
+          );
+        }
+
+        cb(null, true);
+      },
     }),
   )
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const cvText = await extractTextFromPDF(file.path);
-    const prompt = generatePrompt(cvText);
-    return {
-      fileName: file.originalname,
-      textPreview: cvText,
-      prompt,
-      result: await this.llmService.extractCVInfo(cvText),
-    };
+    const dataBuffer = fs.readFileSync(file.path);
+    const pdfData = await PdfParse(dataBuffer);
+    const resumeText = pdfData.text;
+    const result1 = await this.parser.parse(dataBuffer);
+    const result2 = await this.analyzer.analyze(JD_TEXT, resumeText);
+    return { result1, result2 };
   }
 }

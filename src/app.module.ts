@@ -1,5 +1,6 @@
 import { JobModule } from '@/modules/job/presentation/job.module';
 import { AuthModule } from '@modules//auth/auth.module';
+import { CandidateModule } from '@modules/candidate/candidate.module';
 import { CvModule } from '@modules/cv/cv.module';
 import { DepartmentModule } from '@modules/department/presentation/department.module';
 import { FileModule } from '@modules/file/file.module';
@@ -15,6 +16,7 @@ import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import generateModulesSet from '@shared/modules-set';
 import { SharedModule } from '@shared/shared.module';
+import { ApplicationModule } from './modules/application/application.module';
 
 const modulesGenerate = generateModulesSet();
 
@@ -36,6 +38,8 @@ const modulesGenerate = generateModulesSet();
     PositionModule,
     JobModule,
     DepartmentModule,
+    CandidateModule,
+    ApplicationModule,
   ],
 })
 export class AppModule {}

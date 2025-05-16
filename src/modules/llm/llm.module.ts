@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
-import { LlmService } from './llm.service';
+import { Module, Provider } from '@nestjs/common';
+import { GroqProvider } from './providers/groq.provider';
+
+const providers: Provider[] = [GroqProvider];
 
 @Module({
-  providers: [LlmService],
-  exports: [LlmService],
+  providers,
+  exports: providers,
 })
 export class LlmModule {}

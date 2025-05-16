@@ -1,10 +1,10 @@
+import { ApplicationModule } from '@modules/application/application.module';
 import { Module } from '@nestjs/common';
-import { LlmModule } from '../llm/llm.module';
 import { CvController } from './cv.controller';
 import { CvService } from './cv.service';
 
 @Module({
-  imports: [LlmModule],
+  imports: [ApplicationModule],
   controllers: [CvController],
   providers: [CvService],
 })

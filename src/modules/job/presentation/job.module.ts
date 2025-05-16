@@ -1,3 +1,4 @@
+import { ApplicationModule } from '@modules/application/application.module';
 import { DepartmentModule } from '@modules/department/presentation/department.module';
 import { PositionModule } from '@modules/position/presentation/position.module';
 import { Module, Provider } from '@nestjs/common';
@@ -21,8 +22,10 @@ const providers: Provider[] = [
     TypeOrmModule.forFeature([JobEntity]),
     PositionModule,
     DepartmentModule,
+    ApplicationModule,
   ],
   controllers: [JobController],
   providers,
+  exports: [JobService],
 })
 export class JobModule {}

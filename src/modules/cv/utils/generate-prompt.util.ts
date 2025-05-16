@@ -20,7 +20,7 @@ ${cvText}
 
 Return only valid JSON without explanation.
 
-    `;
+`;
 };
 
 export const generatePromptForCV = (cvText: string): string => {

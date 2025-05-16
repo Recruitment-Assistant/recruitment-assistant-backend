@@ -17,7 +17,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import compression from 'compression';
-import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import { AppModule } from './app.module';
@@ -33,7 +32,7 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
 
   // Setup security headers
-  app.use(helmet());
+  // app.use(helmet());
 
   // For high-traffic websites in production, it is strongly recommended to offload compression from the application server - typically in a reverse proxy (e.g., Nginx). In that case, you should not use compression middleware.
   app.use(compression());
@@ -47,12 +46,13 @@ async function bootstrap() {
   });
   const appUrl = configService.getOrThrow<string>('app.url', { infer: true });
 
-  app.enableCors({
-    origin: corsOrigin,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true,
-  });
+  app.enableCors();
+  // app.enableCors({
+  //   origin: corsOrigin,
+  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  //   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  //   credentials: true,
+  // });
   console.info('CORS Origin:', corsOrigin);
 
   // Use global prefix if you don't have subdomain

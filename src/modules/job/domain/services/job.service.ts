@@ -8,6 +8,7 @@ import { CreateJobDto } from '@modules/job/presentation/dto/request/create-job.d
 import { IPositionRepository } from '@modules/position/application/ports/position.repository.interface';
 import { POSITION_REPOSITORY } from '@modules/position/position.constant';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { JOB_REPOSITORY } from '../constants';
 import { Job } from '../entities/job';
 
@@ -39,6 +40,7 @@ export class JobService {
     return this.jobRepository.findAll(filter);
   }
 
+  @OnEvent('job.get-job-by-id')
   async getJobById(id: Uuid) {
     return Optional.of(await this.jobRepository.findById(id))
       .throwIfNullable(new NotFoundException('Job not found'))
