@@ -60,10 +60,10 @@ export class FileService {
 
   async toFileInfoResponse(cloudinaryResponse: UploadApiResponse) {
     const fileResponse = new FileInfoResDto();
-    fileResponse.publicId = cloudinaryResponse.public_id;
-    fileResponse.originalFilename = cloudinaryResponse.original_filename;
+    fileResponse.public_id = cloudinaryResponse.public_id;
+    fileResponse.original_filename = cloudinaryResponse.original_filename;
     fileResponse.format = cloudinaryResponse.format;
-    fileResponse.resourceType = cloudinaryResponse.resource_type;
+    fileResponse.resource_type = cloudinaryResponse.resource_type;
     fileResponse.url = cloudinaryResponse.secure_url;
     fileResponse.bytes = cloudinaryResponse.bytes;
     return fileResponse;

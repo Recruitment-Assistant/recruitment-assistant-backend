@@ -3,6 +3,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class CreateApplicationTable1747334902005 implements MigrationInterface {
   name = 'CreateApplicationTable1747334902005';
   tableName = 'application';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE TABLE "${this.tableName}" (
@@ -11,7 +12,7 @@ export class CreateApplicationTable1747334902005 implements MigrationInterface {
         "candidate_id" uuid NOT NULL,
         "job_id" uuid NOT NULL,
         "source" character varying DEFAULT NULL,
-        "resume_url" character varying NOT NULL,
+        "resume" jsonb NOT NULL,
         "raw_resume_text" text DEFAULT NULL,
         "screening_score" float DEFAULT 0,
         "screening_note" text DEFAULT NULL,
@@ -20,7 +21,7 @@ export class CreateApplicationTable1747334902005 implements MigrationInterface {
         "current_stage" character varying DEFAULT NULL,
         "status" character varying DEFAULT NULL,
         "expected_salary" decimal DEFAULT NULL,
-        "referred_by" uuid DEFAULT NULL,
+        "referred_by" character varying DEFAULT NULL,
         "applied_at" TIMESTAMP WITH TIME ZONE DEFAULT now(),
         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
@@ -51,13 +52,6 @@ export class CreateApplicationTable1747334902005 implements MigrationInterface {
     `);
 
     await queryRunner.query(`
-      ALTER TABLE "${this.tableName}"
-      ADD CONSTRAINT "FK_application_referred_by"
-      FOREIGN KEY ("referred_by") REFERENCES "user"("id")
-      ON DELETE SET NULL ON UPDATE NO ACTION
-    `);
-
-    await queryRunner.query(`
       CREATE INDEX "IDX_application_candidate_id" ON "${this.tableName}" ("candidate_id")
     `);
 
@@ -78,10 +72,6 @@ export class CreateApplicationTable1747334902005 implements MigrationInterface {
 
     await queryRunner.query(`
       DROP INDEX IF EXISTS "IDX_application_candidate_id"
-    `);
-
-    await queryRunner.query(`
-      ALTER TABLE "${this.tableName}" DROP CONSTRAINT "FK_application_referred_by"
     `);
 
     await queryRunner.query(`

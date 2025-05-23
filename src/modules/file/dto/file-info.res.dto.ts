@@ -4,18 +4,18 @@ import { Expose } from 'class-transformer';
 export class FileInfoResDto {
   @Expose({ name: 'public_id' })
   @StringField({ name: 'public_id' })
-  publicId: string;
+  public_id: string;
 
   @Expose({ name: 'original_filename' })
   @StringField({ name: 'original_filename' })
-  originalFilename: string;
+  original_filename: string;
 
   @StringField()
   format: string;
 
   @Expose({ name: 'resource_type' })
   @StringField({ name: 'resource_type' })
-  resourceType: string;
+  resource_type: string;
 
   @StringField()
   url: string;

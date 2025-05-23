@@ -3,8 +3,10 @@ import { OffsetPaginatedDto } from '@common/dto/offset-pagination/paginated.dto'
 import { EventService } from '@common/events/event.service';
 import { ICurrentUser } from '@common/interfaces';
 import { Uuid } from '@common/types/common.type';
+import { FileEntity } from '@database/entities/file.entity';
 import { CandidateEntity } from '@modules/candidate/entities/candidate.entity';
 import { CandidateRepository } from '@modules/candidate/repositories/candidate.repository';
+import { FileInfoResDto } from '@modules/file/dto/file-info.res.dto';
 import { FileService } from '@modules/file/file.service';
 import { GetJobByIdEvent } from '@modules/job/domain/events/get-job-by-id.event';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -52,14 +54,14 @@ export class ApplicationService {
     analysisResult,
     jobId,
     resumeText,
-    resumeUrl,
+    resume,
     user,
   }: {
     resumeData: ResumeData;
     analysisResult: AnalysisResult;
     jobId: Uuid;
     resumeText: string;
-    resumeUrl: string;
+    resume: FileEntity;
     user: ICurrentUser;
   }) {
     const candidateId = uuidv4() as Uuid;
@@ -94,7 +96,7 @@ export class ApplicationService {
         certifications: resumeData.certifications,
         summary: resumeData.summary,
         source: 'UPLOAD',
-        resumeUrl,
+        resume: resume,
       }),
     );
 
@@ -104,7 +106,7 @@ export class ApplicationService {
         organizationId: user.currentOrganizationId,
         candidateId,
         jobId,
-        resumeUrl,
+        resume: resume,
         rawResumeText: resumeText,
         screeningScore: analysisResult.score_resume_match,
         scoreResumeMatch: analysisResult.score_resume_match,
@@ -160,7 +162,8 @@ export class ApplicationService {
       const resumeText = pdfData.text;
 
       sendProgress({ type: 'reading', payload: resumeText }, 'reading');
-      const resumeUpload = await this.fileService.handleFileUpload(resumeFile);
+      const resumeUpload: FileInfoResDto =
+        await this.fileService.handleFileUpload(resumeFile);
       sendProgress({ type: 'extracting', payload: resumeUpload }, 'extracting');
 
       const resumeData = await this.parser.parse(dataBuffer);
@@ -175,7 +178,7 @@ export class ApplicationService {
         resumeData,
         jobId,
         resumeText,
-        resumeUrl: resumeUpload.url,
+        resume: resumeUpload,
         user,
       });
 

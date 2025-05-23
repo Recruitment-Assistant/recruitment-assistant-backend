@@ -24,7 +24,7 @@ export class CreateCandidateTable1747330941382 implements MigrationInterface {
         "languages" character varying[] DEFAULT NULL,
         "certifications" character varying[] DEFAULT NULL,
         "summary" text DEFAULT NULL,
-        "resume_url" character varying DEFAULT NULL,
+        "resume" jsonb DEFAULT NULL,
         "source" character varying DEFAULT NULL,
         "notes" text DEFAULT NULL,
         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),

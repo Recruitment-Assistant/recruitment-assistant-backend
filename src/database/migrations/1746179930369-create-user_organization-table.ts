@@ -37,6 +37,17 @@ export class CreateUserOrganizationTable1746179930369
         ALTER TABLE "${this.tableName}"
         ADD CONSTRAINT "UQ_user_organization_user_id_organization_id" UNIQUE ("user_id", "organization_id")
       `);
+
+    await queryRunner.query(`
+        ALTER TABLE "user"
+        ADD COLUMN "organization_id" UUID DEFAULT NULL
+      `);
+
+    await queryRunner.query(`
+        ALTER TABLE "user"
+        ADD CONSTRAINT "FK_user_organization_id" FOREIGN KEY ("organization_id") REFERENCES "organization"("id")
+        ON DELETE SET NULL ON UPDATE NO ACTION
+      `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -50,6 +61,14 @@ export class CreateUserOrganizationTable1746179930369
 
     await queryRunner.query(`
         ALTER TABLE "${this.tableName}" DROP CONSTRAINT "FK_user_organization_user_id"
+      `);
+
+    await queryRunner.query(`
+        ALTER TABLE "user" DROP CONSTRAINT "FK_user_organization_id"
+      `);
+
+    await queryRunner.query(`
+        ALTER TABLE "user" DROP COLUMN "organization_id"
       `);
 
     await queryRunner.query(`

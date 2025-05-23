@@ -6,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Relation,
   Unique,
@@ -18,11 +19,6 @@ import { OrganizationEntity } from './organization.entity';
   'organizationId',
 ])
 export class UserOrganizationEntity extends AbstractEntity {
-  constructor(data?: Partial<UserOrganizationEntity>) {
-    super();
-    Object.assign(this, data);
-  }
-
   @PrimaryGeneratedColumn('uuid', {
     name: 'id',
     primaryKeyConstraintName: 'PK_user_organization_id',
@@ -41,7 +37,7 @@ export class UserOrganizationEntity extends AbstractEntity {
   @Column('timestamptz', { name: 'joined_at', nullable: true })
   joinedAt!: Date | null;
 
-  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @OneToOne(() => UserEntity, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({
     name: 'user_id',
     referencedColumnName: 'id',
@@ -59,4 +55,9 @@ export class UserOrganizationEntity extends AbstractEntity {
     foreignKeyConstraintName: 'FK_user_organization_organization_id',
   })
   organization!: Relation<OrganizationEntity>;
+
+  constructor(data?: Partial<UserOrganizationEntity>) {
+    super();
+    Object.assign(this, data);
+  }
 }

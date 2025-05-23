@@ -1,5 +1,6 @@
 import { Uuid } from '@common/types/common.type';
 import { AbstractEntity } from '@database/entities/abstract.entity';
+import { FileEntity } from '@database/entities/file.entity';
 import { CandidateEntity } from '@modules/candidate/entities/candidate.entity';
 import { JobEntity } from '@modules/job/infrastructure/database/entities/job.entity';
 import { OrganizationEntity } from '@modules/organization/entities/organization.entity';
@@ -41,8 +42,8 @@ export class ApplicationEntity extends AbstractEntity {
   @Column('varchar', { nullable: true })
   source?: string;
 
-  @Column('varchar', { name: 'resume_url' })
-  resumeUrl!: string;
+  @Column('jsonb', { name: 'resume' })
+  resume!: FileEntity;
 
   @Column('text', { name: 'raw_resume_text', nullable: true })
   rawResumeText?: string;

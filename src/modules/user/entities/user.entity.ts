@@ -3,6 +3,7 @@ import { GENDER } from '@common/constants/entity.enum';
 import { Uuid } from '@common/types/common.type';
 import { hashPassword as hashPass } from '@common/utils/password.util';
 import { AbstractEntity } from '@database/entities/abstract.entity';
+import { OrganizationEntity } from '@modules/organization/entities/organization.entity';
 import { PermissionEntity } from '@modules/permission/entities/permission.entity';
 import { RoleEntity } from '@modules/role/entities/role.entity';
 import { SessionEntity } from '@modules/session/entities/session.entity';
@@ -12,20 +13,17 @@ import {
   Column,
   Entity,
   Index,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
 
 @Entity('user', { schema: 'public' })
 export class UserEntity extends AbstractEntity {
-  constructor(data?: Partial<UserEntity>) {
-    super();
-    Object.assign(this, data);
-  }
-
   @PrimaryGeneratedColumn('uuid', { primaryKeyConstraintName: 'PK_user_id' })
   id!: Uuid;
 
@@ -74,10 +72,22 @@ export class UserEntity extends AbstractEntity {
   @OneToMany(() => SessionEntity, (session) => session.user)
   sessions?: SessionEntity[];
 
+  @OneToOne(() => OrganizationEntity, { nullable: false })
+  @JoinColumn({ name: 'organization_id' })
+  organization: Relation<OrganizationEntity>;
+
+  @Column('uuid', { name: 'organization_id', nullable: true })
+  organizationId: Uuid;
+
   permissions?: Partial<PermissionEntity>[];
 
-  @OneToMany(() => UserOrganizationEntity, (userOrg) => userOrg.user)
-  userOrganizations?: Relation<UserOrganizationEntity>[];
+  @OneToOne(() => UserOrganizationEntity, (userOrg) => userOrg.user)
+  userOrganization?: Relation<UserOrganizationEntity>;
+
+  constructor(data?: Partial<UserEntity>) {
+    super();
+    Object.assign(this, data);
+  }
 
   @BeforeInsert()
   @BeforeUpdate()
