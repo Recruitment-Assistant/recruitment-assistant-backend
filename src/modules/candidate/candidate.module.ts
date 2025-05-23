@@ -9,5 +9,6 @@ import { CandidateRepository } from './repositories/candidate.repository';
   imports: [TypeOrmModule.forFeature([CandidateEntity])],
   controllers: [CandidateController],
   providers: [CandidateService, CandidateRepository],
+  exports: [CandidateService, CandidateRepository],
 })
 export class CandidateModule {}

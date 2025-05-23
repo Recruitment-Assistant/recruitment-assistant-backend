@@ -133,3 +133,13 @@ Có khả năng giải quyết vấn đề và tư duy logic tốt.
 Khả năng học hỏi nhanh các công nghệ mới.
 Có kỹ năng giao tiếp tốt.
 `;
+
+export const generateJDtext = (description: string, requirements: string) => {
+  return `
+  Job Descsiption:
+   ${description}
+   
+  Requirements:
+   ${requirements}
+  `;
+};

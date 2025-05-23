@@ -42,6 +42,9 @@ export class JobMapper implements Mapper<Job> {
     if (entity.creator) {
       job.creator = entity.creator;
     }
+    if (entity.department) {
+      job.department = DepartmentMapper.toDomain(entity.department);
+    }
 
     return job;
   }

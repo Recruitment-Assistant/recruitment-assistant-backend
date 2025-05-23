@@ -11,6 +11,9 @@ import {
 } from '@common/decorators/field.decorators';
 import { BaseResDto } from '@common/dto/base.res.dto';
 import { Uuid } from '@common/types/common.type';
+import { DepartmentResDto } from '@modules/department/presentation/dto/response/department.res.dto';
+import { PositionResDto } from '@modules/position/presentation/dto/response/position.res.dto';
+import { BaseUserResDto } from '@shared/dto/base-user.res.dto';
 import { Expose } from 'class-transformer';
 import { SalaryRangeDto } from '../salary-range.dto';
 
@@ -83,4 +86,16 @@ export class JobResDto extends BaseResDto {
   @UUIDFieldOptional({ name: 'created_by' })
   @Expose()
   createdBy: Uuid;
+
+  @ClassFieldOptional(() => DepartmentResDto)
+  @Expose()
+  department: DepartmentResDto;
+
+  @ClassFieldOptional(() => PositionResDto)
+  @Expose()
+  position: PositionResDto;
+
+  @ClassFieldOptional(() => BaseUserResDto)
+  @Expose()
+  creator: BaseUserResDto;
 }

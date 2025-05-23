@@ -9,10 +9,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Relation,
   Unique,
 } from 'typeorm';
+import { ResumeAnalysisLogEntity } from './resume-analysis-log.entity';
 
 @Entity('application', { schema: 'public' })
 @Unique('UQ_candidate_id_job_id', ['candidateId', 'jobId'])
@@ -103,4 +105,10 @@ export class ApplicationEntity extends AbstractEntity {
     foreignKeyConstraintName: 'FK_application_referred_by',
   })
   referrer?: Relation<UserEntity>;
+
+  @OneToOne(() => ResumeAnalysisLogEntity, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  resumeLog: ResumeAnalysisLogEntity;
 }

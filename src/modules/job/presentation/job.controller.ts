@@ -1,13 +1,15 @@
 import { ErrorCode } from '@common/constants/error-code';
 import { CurrentOrganizationId } from '@common/decorators/current-organization.decorator';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
-import { ApiAuth } from '@common/decorators/http.decorators';
+import { ApiAuth, ApiPublic } from '@common/decorators/http.decorators';
 import { UploadFileDecorator } from '@common/decorators/upload-file.decorator';
 import { ValidateUuid } from '@common/decorators/validators/uuid-validator';
 import { OffsetPaginatedDto } from '@common/dto/offset-pagination/paginated.dto';
 import { ValidationException } from '@common/exceptions/validation.exception';
 import { ICurrentUser } from '@common/interfaces';
 import { Uuid } from '@common/types/common.type';
+import { ApplicationService } from '@modules/application/application.service';
+import { ISSEMessage } from '@modules/application/types/sse-message.interface';
 import { UploadResumeByJobIdUseCase } from '@modules/application/use-cases/upload-resume-by-job-id.use-case';
 import {
   Body,
@@ -19,13 +21,16 @@ import {
   Post,
   Put,
   Query,
+  Sse,
+  UploadedFile,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import path, { extname } from 'path';
+import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { JobMapper } from '../application/mappers/job.mapper';
 import { JobService } from '../domain/services/job.service';
@@ -41,6 +46,7 @@ export class JobController {
   constructor(
     private readonly jobService: JobService,
     private readonly uploadResumeByJobIdUseCase: UploadResumeByJobIdUseCase,
+    private readonly applicationService: ApplicationService,
   ) {}
 
   @Post()
@@ -147,7 +153,7 @@ export class JobController {
     await this.jobService.deleteJob(jobId);
   }
 
-  @Post(':jobId/resumes/upload')
+  @Post(':jobId/resumes/upload/multiple')
   @ApiAuth({
     summary: 'Upload resumes',
     description: 'Upload list resume',
@@ -188,5 +194,75 @@ export class JobController {
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     return this.uploadResumeByJobIdUseCase.execute(jobId, files);
+  }
+
+  @Post(':jobId/resumes/upload')
+  @ApiAuth({
+    summary: 'Upload one resume',
+    description: 'Upload one resume',
+  })
+  @ApiParam({
+    name: 'jobId',
+    description: 'The UUID of the job',
+    type: 'string',
+  })
+  @UploadFileDecorator()
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './src/uploads',
+        filename: (_req, file, cb) => {
+          console.log('check file: ', file);
+          const fileName = `${uuidv4()}${extname(file.originalname)}`;
+          cb(null, fileName);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (
+          !['.pdf'].includes(
+            path.extname(file.originalname).toLocaleLowerCase(),
+          )
+        ) {
+          cb(
+            new ValidationException(ErrorCode.COMMON, 'Only support pdf file'),
+            false,
+          );
+        }
+
+        cb(null, true);
+      },
+    }),
+  )
+  async uploadResume(
+    @Param('jobId', ValidateUuid) jobId: Uuid,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: ICurrentUser,
+    @Body('analysisId') analysisId: string,
+  ) {
+    this.applicationService.handleAnalysisOneResume(
+      {
+        jobId,
+        resumeFile: file,
+        user,
+      },
+      analysisId,
+    );
+
+    return {
+      analysisId,
+    };
+  }
+
+  @ApiPublic()
+  @Sse('resume/analyze')
+  streamAnalysis(
+    @Query('analysisId') analysisId: string,
+  ): Observable<ISSEMessage> {
+    console.log('streamAnalysis: ', analysisId);
+    if (!analysisId) {
+      throw new Error('analysisId is required');
+    }
+
+    return this.applicationService.createStream(analysisId);
   }
 }

@@ -2,8 +2,8 @@ import { GroqProvider } from '@modules/llm/providers/groq.provider';
 import { Injectable } from '@nestjs/common';
 import Groq from 'groq-sdk';
 import pdfParse from 'pdf-parse';
-import { ParsedResumeDto } from '../dto/parsed-resume.dto';
 import { ResumeParserPort } from '../ports/resume-parser.port';
+import { ResumeData } from '../types/resume-parsed.dto';
 
 @Injectable()
 export class ResumeParserAdapter implements ResumeParserPort {
@@ -12,20 +12,20 @@ export class ResumeParserAdapter implements ResumeParserPort {
     this.openai = this.openaiProvider.getClient();
   }
 
-  async parse(buffer: Buffer): Promise<ParsedResumeDto> {
+  async parse(buffer: Buffer): Promise<ResumeData> {
     const resumeText = await this.extractText(buffer);
 
     const prompt = `
 Parse the following resume text and extract the information into valid JSON with this format:
 {
-  "fullName": "string",
+  "full_name": "string",
   "email": "string",
   "phone": "string",
   "address": "string",
   "linkedin": "string",
   "skills": ["string"],
-  "education": [{ "school": "string", "degree": "string", "major": "string", "startDate": "YYYY-MM", "endDate": "YYYY-MM" }],
-  "workExperience": [{ "company": "string", "position": "string", "startDate": "YYYY-MM", "endDate": "YYYY-MM", "description": "string" }],
+  "education": [{ "school": "string", "degree": "string", "major": "string", "start_date": "YYYY-MM", "end_date": "YYYY-MM" }],
+  "work_experience": [{ "company": "string", "position": "string", "start_date": "YYYY-MM", "end_date": "YYYY-MM", "description": "string" }],
   "certifications": ["string"],
   "languages": ["string"],
   "summary": "string"
@@ -52,7 +52,7 @@ Return only valid JSON without explanation.
 
     const json = response.choices[0].message?.content;
 
-    return JSON.parse(this.cleanJsonResponse(json) || '{}') as ParsedResumeDto;
+    return JSON.parse(this.cleanJsonResponse(json) || '{}') as ResumeData;
   }
 
   private async extractText(buffer: Buffer): Promise<string> {

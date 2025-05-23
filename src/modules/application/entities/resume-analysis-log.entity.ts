@@ -4,7 +4,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
@@ -35,7 +35,7 @@ export class ResumeAnalysisLogEntity extends AbstractEntity {
   scoreResumeMatch?: number;
 
   @Column('varchar', { name: 'experience_level', nullable: true })
-  experienceLevel?: 'junior' | 'mid' | 'senior';
+  experienceLevel?: 'junior' | 'mid' | 'senior' | string;
 
   @Column('text', { nullable: true })
   feedback?: string;
@@ -61,7 +61,7 @@ export class ResumeAnalysisLogEntity extends AbstractEntity {
   @Column('timestamptz', { name: 'analyzed_at', default: () => 'now()' })
   analyzedAt!: Date;
 
-  @ManyToOne(() => ApplicationEntity, { onDelete: 'CASCADE' })
+  @OneToOne(() => ApplicationEntity, { onDelete: 'CASCADE' })
   @JoinColumn({
     name: 'application_id',
     referencedColumnName: 'id',

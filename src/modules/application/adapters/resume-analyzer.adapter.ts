@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import Groq from 'groq-sdk';
 import { PROMPT_ANALYSIS_RESUME } from '../constants/prompt-analysis-resume.constant';
 import { ResumeAnalyzerPort } from '../ports/resume-analyzer.port';
+import { AnalysisResult } from '../types/analysis-result.dto';
 
 @Injectable()
 export class ResumeAnalyzerAdapter implements ResumeAnalyzerPort {
@@ -29,7 +30,7 @@ You must strictly follow the JSON format requested by the user.`,
 
     const json = response.choices[0].message?.content;
 
-    return JSON.parse(this.cleanJsonResponse(json) || '{}');
+    return JSON.parse(this.cleanJsonResponse(json) || '{}') as AnalysisResult;
   }
 
   private cleanJsonResponse(raw: string): string {
