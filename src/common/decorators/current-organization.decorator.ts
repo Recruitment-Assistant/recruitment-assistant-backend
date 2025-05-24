@@ -7,9 +7,9 @@ export const CurrentOrganizationId = createParamDecorator(
     const request = ctx.switchToHttp().getRequest();
     const user = request.user as ICurrentUser;
 
-    if (!user || !user.currentOrganizationId) {
+    if (!user || !user.organizationId) {
       return undefined;
     }
-    return user.currentOrganizationId;
+    return user.organizationId;
   },
 );

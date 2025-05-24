@@ -1,8 +1,15 @@
-import { NumberField, StringField } from '@common/decorators/field.decorators';
+import {
+  NumberField,
+  StringField,
+  StringFieldOptional,
+} from '@common/decorators/field.decorators';
 
 export class LoginResDto {
   @StringField({ name: 'user_id' })
   userId!: string;
+
+  @StringFieldOptional({ name: 'organization_id', nullable: true })
+  organizationId?: string;
 
   @StringField({ name: 'access_token' })
   accessToken!: string;

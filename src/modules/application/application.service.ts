@@ -70,7 +70,7 @@ export class ApplicationService {
     await this.candidateRepository.save(
       new CandidateEntity({
         id: candidateId,
-        organizationId: user.currentOrganizationId,
+        organizationId: user.organizationId,
         createdBy: user.id,
         fullName: resumeData.full_name,
         email: resumeData.email,
@@ -103,7 +103,7 @@ export class ApplicationService {
     await this.applicationRepository.save(
       new ApplicationEntity({
         id: applicationId,
-        organizationId: user.currentOrganizationId,
+        organizationId: user.organizationId,
         candidateId,
         jobId,
         resume: resume,

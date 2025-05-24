@@ -59,7 +59,7 @@ export class JobController {
     @CurrentUser() user: ICurrentUser,
     @Body() dto: CreateJobDto,
   ): Promise<JobResDto> {
-    dto.organizationId = user.currentOrganizationId;
+    dto.organizationId = user.organizationId;
     dto.createdBy = user.id;
     const result = await this.jobService.createJob(dto);
     return JobMapper.toDto(result);

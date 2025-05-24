@@ -1,17 +1,14 @@
-import { GOOGLE_URL } from '@common/constants/app.constant';
 import { CacheKey } from '@common/constants/cache.constant';
-import { ROLE } from '@common/constants/entity.enum';
 import { ErrorCode } from '@common/constants/error-code';
 import { CommonFunction } from '@common/helpers/common.function';
 import { Uuid } from '@common/types/common.type';
 import { JwtUtil } from '@common/utils/jwt.util';
 import { Optional } from '@common/utils/optional';
-import { hashPassword, verifyPassword } from '@common/utils/password.util';
+import { hashPassword } from '@common/utils/password.util';
 import { MailService } from '@libs/mail/mail.service';
 import { CacheTTL } from '@libs/redis/utils/cache-ttl.utils';
 import { CreateCacheKey } from '@libs/redis/utils/create-cache-key.utils';
 import { EmailReqDto } from '@modules/auth/dto/request/email.req.dto';
-import { LoginWithGoogleReqDto } from '@modules/auth/dto/request/login-with-google.req.dto';
 import { ResetPasswordReqDto } from '@modules/auth/dto/request/reset-password.req.dto';
 import { VerifyPinCodeReqDto } from '@modules/auth/dto/request/verify-pin-code.req.dto';
 import { SessionEntity } from '@modules/session/entities/session.entity';
@@ -26,19 +23,13 @@ import {
   Inject,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import type { Cache } from 'cache-manager';
 import { plainToInstance } from 'class-transformer';
-import { firstValueFrom } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { ICurrentUser } from 'src/common/interfaces';
 import { OrganizationService } from '../organization/organization.service';
-import { LoginReqDto } from './dto/request/login.req.dto';
-import { RefreshReqDto } from './dto/request/refresh.req.dto';
 import { RegisterReqDto } from './dto/request/register.req.dto';
 import { LoginResDto } from './dto/response/login.res.dto';
-import { RefreshResDto } from './dto/response/refresh.res.dto';
 import { RegisterResDto } from './dto/response/register.res.dto';
 
 @Injectable()
@@ -53,65 +44,6 @@ export class AuthService {
     private readonly cacheService: Cache,
     private readonly organizationService: OrganizationService,
   ) {}
-
-  async signIn(
-    dto: LoginReqDto,
-    forAdmin: boolean = false,
-  ): Promise<LoginResDto> {
-    const { email, password } = dto;
-    const user = Optional.of(
-      await this.userService.findOneByCondition({ email }),
-    )
-      .throwIfNullable(new NotFoundException(ErrorCode.ACCOUNT_NOT_REGISTER))
-      .get() as UserEntity;
-
-    const roles = user.roles.map((role) => role.name);
-
-    if (forAdmin && !roles.includes(ROLE.ADMIN)) {
-      throw new UnauthorizedException(ErrorCode.ACCESS_DENIED);
-    }
-
-    if (!user.isActive || !user.isConfirmed) {
-      throw new BadRequestException(ErrorCode.ACCOUNT_NOT_ACTIVATED);
-    }
-
-    const isPasswordValid = await verifyPassword(password, user.password);
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException(ErrorCode.INVALID_CREDENTIALS);
-    }
-
-    return this.createToken(user);
-  }
-
-  async loginWithGoogle(dto: LoginWithGoogleReqDto) {
-    const googleResponse = await firstValueFrom(
-      this.httpService
-        .get(GOOGLE_URL.concat(dto.accessToken))
-        .pipe(map((response) => response.data)),
-    );
-    const user = await this.userService.findOneByCondition({
-      email: googleResponse.email,
-    });
-    if (user !== null) {
-      return this.createToken(user);
-    } else {
-      const isDeletedUser = await this.userService.isExistUserByEmail(
-        googleResponse.email,
-      );
-      if (isDeletedUser) {
-        throw new BadRequestException(ErrorCode.ACCOUNT_LOCKED);
-      }
-
-      const newUser = await this.userService.create({
-        email: googleResponse.email,
-        password: googleResponse.id,
-        name: googleResponse.name,
-        avatar: googleResponse.picture,
-      });
-      return this.createToken(newUser);
-    }
-  }
 
   async register(dto: RegisterReqDto): Promise<RegisterResDto> {
     const { email, password, name } = dto;
@@ -129,36 +61,6 @@ export class AuthService {
     return plainToInstance(RegisterResDto, {
       userId: user.id,
     });
-  }
-
-  async logout(sessionId: Uuid | string): Promise<void> {
-    Optional.of(
-      await this.sessionService.findById(sessionId as Uuid),
-    ).throwIfNotPresent(new UnauthorizedException(ErrorCode.UNAUTHORIZED));
-    await this.sessionService.deleteById(sessionId);
-  }
-
-  async refreshToken(
-    dto: RefreshReqDto,
-    forAdmin: boolean = false,
-  ): Promise<RefreshResDto> {
-    const { sessionId, hash } = this.jwtUtil.verifyRefreshToken(
-      dto.refreshToken,
-    );
-    const session = await this.sessionService.findById(sessionId);
-    if (!session || session.hash !== hash) {
-      throw new UnauthorizedException(ErrorCode.REFRESH_TOKEN_INVALID);
-    }
-
-    const user = await this.userService.findOneByCondition({
-      id: session.userId,
-    });
-    const roles = user.roles.map((role) => role.name);
-    if (forAdmin && !roles.includes(ROLE.ADMIN)) {
-      throw new UnauthorizedException(ErrorCode.ACCESS_DENIED);
-    }
-
-    return this.createToken(user, sessionId);
   }
 
   async verifyActivationToken(token: string) {
@@ -308,7 +210,7 @@ export class AuthService {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
-      currentOrganizationId: orgId,
+      organizationId: orgId,
     });
 
     return plainToInstance(LoginResDto, {

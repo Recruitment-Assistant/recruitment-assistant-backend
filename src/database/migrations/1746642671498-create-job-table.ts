@@ -8,10 +8,8 @@ export class CreateJobTable1746642671498 implements MigrationInterface {
     await queryRunner.query(`
             CREATE TABLE "${this.tableName}" (
               "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-              "job_code" character varying DEFAULT NULL,
-              "organization_id" uuid,
+              "organization_id" uuid NOT NULL,
               "department_id" uuid DEFAULT NULL,
-              "position_id" uuid NOT NULL,
               "created_by" uuid NOT NULL,
               "title" character varying NOT NULL,
               "tags" character varying[] NOT NULL,
@@ -37,20 +35,13 @@ export class CreateJobTable1746642671498 implements MigrationInterface {
             ALTER TABLE "${this.tableName}"
             ADD CONSTRAINT "FK_job_organization_id"
             FOREIGN KEY ("organization_id") REFERENCES "organization"("id")
-            ON DELETE SET NULL ON UPDATE CASCADE
+            ON DELETE SET NULL ON UPDATE NO ACTION
           `);
 
     await queryRunner.query(`
             ALTER TABLE "${this.tableName}"
             ADD CONSTRAINT "FK_job_department_id"
             FOREIGN KEY ("department_id") REFERENCES "department"("id")
-            ON DELETE NO ACTION ON UPDATE NO ACTION
-          `);
-
-    await queryRunner.query(`
-            ALTER TABLE "${this.tableName}"
-            ADD CONSTRAINT "FK_job_position_id"
-            FOREIGN KEY ("position_id") REFERENCES "position"("id")
             ON DELETE NO ACTION ON UPDATE NO ACTION
           `);
 
@@ -68,7 +59,7 @@ export class CreateJobTable1746642671498 implements MigrationInterface {
           `);
 
     await queryRunner.query(`
-            ALTER TABLE "${this.tableName}" DROP CONSTRAINT "FK_job_position_id"
+            ALTER TABLE "${this.tableName}" DROP CONSTRAINT "FK_job_department_id"
           `);
 
     await queryRunner.query(`

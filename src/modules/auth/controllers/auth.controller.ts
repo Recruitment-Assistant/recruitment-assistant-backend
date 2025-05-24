@@ -1,5 +1,11 @@
+import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { ApiAuth, ApiPublic } from '@common/decorators/http.decorators';
 import { ICurrentUser } from '@common/interfaces';
+import { Uuid } from '@common/types/common.type';
+import { LogoutCommand } from '@modules/auth/commands/log-out.command';
+import { LoginGoogleCommand } from '@modules/auth/commands/login-google.command';
+import { LoginCommand } from '@modules/auth/commands/login.command';
+import { RefreshTokenCommand } from '@modules/auth/commands/refresh-token.command';
 import { ConfirmEmailReqDto } from '@modules/auth/dto/request/confirm-email.req.dto';
 import { EmailReqDto } from '@modules/auth/dto/request/email.req.dto';
 import { LoginWithGoogleReqDto } from '@modules/auth/dto/request/login-with-google.req.dto';
@@ -15,6 +21,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from '../auth.service';
 import { LoginReqDto } from '../dto/request/login.req.dto';
@@ -24,7 +31,6 @@ import { SelectOrgDto } from '../dto/request/select-org.dto';
 import { LoginResDto } from '../dto/response/login.res.dto';
 import { RefreshResDto } from '../dto/response/refresh.res.dto';
 import { RegisterResDto } from '../dto/response/register.res.dto';
-import { CurrentUser } from './../../../common/decorators/current-user.decorator';
 
 @ApiTags('Auth APIs')
 @Controller({
@@ -32,7 +38,10 @@ import { CurrentUser } from './../../../common/decorators/current-user.decorator
   version: '1',
 })
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   @ApiPublic({
     type: RegisterResDto,
@@ -49,7 +58,7 @@ export class AuthController {
   })
   @Post('login')
   async login(@Body() userLogin: LoginReqDto): Promise<LoginResDto> {
-    return this.authService.signIn(userLogin);
+    return this.commandBus.execute(new LoginCommand(userLogin));
   }
 
   @ApiPublic({
@@ -58,7 +67,7 @@ export class AuthController {
   })
   @Post('google')
   async loginWithGoogle(@Body() request: LoginWithGoogleReqDto) {
-    return await this.authService.loginWithGoogle(request);
+    return this.commandBus.execute(new LoginGoogleCommand(request));
   }
 
   @ApiPublic({
@@ -67,7 +76,7 @@ export class AuthController {
   })
   @Post('refresh')
   async refresh(@Body() dto: RefreshReqDto): Promise<RefreshResDto> {
-    return this.authService.refreshToken(dto);
+    return this.commandBus.execute(new RefreshTokenCommand(dto));
   }
 
   @ApiAuth({
@@ -75,8 +84,8 @@ export class AuthController {
     statusCode: HttpStatus.NO_CONTENT,
   })
   @Post('logout')
-  async logout(@CurrentUser('sessionId') sessionId: string): Promise<void> {
-    await this.authService.logout(sessionId);
+  async logout(@CurrentUser('sessionId') sessionId: Uuid): Promise<void> {
+    return this.commandBus.execute(new LogoutCommand(sessionId));
   }
 
   @ApiPublic({

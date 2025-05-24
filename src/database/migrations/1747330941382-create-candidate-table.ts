@@ -35,14 +35,10 @@ export class CreateCandidateTable1747330941382 implements MigrationInterface {
     `);
 
     await queryRunner.query(`
-        ALTER TABLE "${this.tableName}"
-        ADD CONSTRAINT "UQ_candidate_email" UNIQUE ("email");
-    `);
-
-    await queryRunner.query(`
-        ALTER TABLE "${this.tableName}"
-        ADD CONSTRAINT "UQ_candidate_phone_number" UNIQUE ("phone_number");
-    `);
+      CREATE UNIQUE INDEX "UQ_candidate_email_organization"
+      ON "${this.tableName}" ("email", "organization_id")
+      WHERE "deleted_at" IS NULL;
+  `);
 
     await queryRunner.query(`
         ALTER TABLE "${this.tableName}"
@@ -61,13 +57,7 @@ export class CreateCandidateTable1747330941382 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-      ALTER TABLE "${this.tableName}"
-      DROP CONSTRAINT "UQ_candidate_email";
-    `);
-
-    await queryRunner.query(`
-      ALTER TABLE "${this.tableName}"
-      DROP CONSTRAINT "UQ_candidate_phone_number";
+      DROP INDEX IF EXISTS "UQ_candidate_email_organization"
     `);
 
     await queryRunner.query(`

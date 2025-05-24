@@ -1,5 +1,6 @@
 import { JobModule } from '@/modules/job/presentation/job.module';
 import { AuthModule } from '@modules//auth/auth.module';
+import { ApplicationModule } from '@modules/application/application.module';
 import { CandidateModule } from '@modules/candidate/candidate.module';
 import { CvModule } from '@modules/cv/cv.module';
 import { DepartmentModule } from '@modules/department/presentation/department.module';
@@ -13,10 +14,10 @@ import { RoleModule } from '@modules/role/role.module';
 import { SessionModule } from '@modules/session/session.module';
 import { UserModule } from '@modules/user/user.module';
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import generateModulesSet from '@shared/modules-set';
 import { SharedModule } from '@shared/shared.module';
-import { ApplicationModule } from './modules/application/application.module';
 
 const modulesGenerate = generateModulesSet();
 
@@ -25,6 +26,7 @@ const modulesGenerate = generateModulesSet();
     ...modulesGenerate,
     EventEmitterModule.forRoot(),
     HealthModule,
+    CqrsModule.forRoot(),
     AuthModule,
     UserModule,
     SessionModule,
