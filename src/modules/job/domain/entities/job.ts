@@ -3,7 +3,6 @@ import { Department } from '@/modules/department/domain/entities/department';
 import { UserEntity } from '@/modules/user/entities/user.entity';
 import { Uuid } from '@common/types/common.type';
 import { OrganizationEntity } from '@modules/organization/entities/organization.entity';
-import { Position } from '@modules/position/domain/entities/position';
 import { BaseEntity } from '@shared/entities/base-entity';
 
 export interface SalaryRange {
@@ -20,8 +19,6 @@ export class Job extends BaseEntity {
     super(data);
     Object.assign(this, data);
   }
-
-  jobCode!: string;
 
   title!: string;
 
@@ -55,13 +52,9 @@ export class Job extends BaseEntity {
 
   createdBy!: Uuid;
 
-  positionId!: Uuid;
-
   organization?: OrganizationEntity;
 
   department?: Department;
-
-  position?: Position;
 
   creator?: UserEntity;
 }

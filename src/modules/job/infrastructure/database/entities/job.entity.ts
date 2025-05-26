@@ -2,7 +2,6 @@ import { EMPLOYMENT_TYPE, JOB_STATUS } from '@/common/constants/entity.enum';
 import { Uuid } from '@/common/types/common.type';
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { OrganizationEntity } from '@/modules/organization/entities/organization.entity';
-import { PositionEntity } from '@/modules/position/infrastructure/database/entities/position.entity';
 import { UserEntity } from '@/modules/user/entities/user.entity';
 import { DepartmentEntity } from '@modules/department/infrastructure/database/entities/department.entity';
 import {
@@ -11,7 +10,6 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  Relation,
 } from 'typeorm';
 
 @Entity('job', { schema: 'public' })
@@ -32,14 +30,8 @@ export class JobEntity extends AbstractEntity {
   @Column('uuid', { name: 'department_id' })
   departmentId!: Uuid;
 
-  @Column('uuid', { name: 'position_id' })
-  positionId!: Uuid;
-
   @Column('uuid', { name: 'created_by' })
   createdBy!: Uuid;
-
-  @Column('varchar', { length: 100, name: 'job_code' })
-  jobCode!: string;
 
   @Column('varchar', { length: 255 })
   title!: string;
@@ -95,14 +87,6 @@ export class JobEntity extends AbstractEntity {
     foreignKeyConstraintName: 'FK_job_department_id',
   })
   department?: DepartmentEntity;
-
-  @ManyToOne(() => PositionEntity)
-  @JoinColumn({
-    name: 'position_id',
-    referencedColumnName: 'id',
-    foreignKeyConstraintName: 'FK_job_position_id',
-  })
-  position!: Relation<PositionEntity>;
 
   @ManyToOne(() => UserEntity)
   @JoinColumn({

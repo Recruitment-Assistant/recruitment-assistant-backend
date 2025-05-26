@@ -6,6 +6,9 @@ import { LogoutCommand } from '@modules/auth/commands/log-out.command';
 import { LoginGoogleCommand } from '@modules/auth/commands/login-google.command';
 import { LoginCommand } from '@modules/auth/commands/login.command';
 import { RefreshTokenCommand } from '@modules/auth/commands/refresh-token.command';
+import { RequestPasswordResetCommand } from '@modules/auth/commands/request-password-reset.command';
+import { ResetPasswordCommand } from '@modules/auth/commands/reset-password.command';
+import { RevokeTokensCommand } from '@modules/auth/commands/revoke-tokens.command';
 import { ConfirmEmailReqDto } from '@modules/auth/dto/request/confirm-email.req.dto';
 import { EmailReqDto } from '@modules/auth/dto/request/email.req.dto';
 import { LoginWithGoogleReqDto } from '@modules/auth/dto/request/login-with-google.req.dto';
@@ -27,7 +30,6 @@ import { AuthService } from '../auth.service';
 import { LoginReqDto } from '../dto/request/login.req.dto';
 import { RefreshReqDto } from '../dto/request/refresh.req.dto';
 import { RegisterReqDto } from '../dto/request/register.req.dto';
-import { SelectOrgDto } from '../dto/request/select-org.dto';
 import { LoginResDto } from '../dto/response/login.res.dto';
 import { RefreshResDto } from '../dto/response/refresh.res.dto';
 import { RegisterResDto } from '../dto/response/register.res.dto';
@@ -113,7 +115,7 @@ export class AuthController {
   })
   @Post('forgot-password')
   async forgotPassword(@Body() dto: EmailReqDto) {
-    return this.authService.forgotPassword(dto);
+    return this.commandBus.execute(new RequestPasswordResetCommand(dto));
   }
 
   @ApiPublic({
@@ -140,7 +142,7 @@ export class AuthController {
   })
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordReqDto) {
-    return this.authService.resetPassword(dto);
+    return this.commandBus.execute(new ResetPasswordCommand(dto));
   }
 
   @ApiAuth({
@@ -149,22 +151,6 @@ export class AuthController {
   })
   @Delete('revoke-token')
   revokeToken(@CurrentUser() user: ICurrentUser) {
-    return this.authService.revokeTokens(user);
-  }
-
-  @Post('select-organization')
-  @ApiAuth({
-    summary: 'Select a organization',
-    statusCode: HttpStatus.OK,
-    type: LoginResDto,
-  })
-  selectOrganization(
-    @CurrentUser() user: ICurrentUser,
-    @Body() selectOrgDto: SelectOrgDto,
-  ) {
-    return this.authService.selectOrganizationAndGenerateToken(
-      user,
-      selectOrgDto.organizationId,
-    );
+    return this.commandBus.execute(new RevokeTokensCommand(user));
   }
 }

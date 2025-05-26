@@ -43,7 +43,6 @@ export class JobRepository implements IJobRepository {
       .createQueryBuilder('job')
       .leftJoinAndSelect('job.organization', 'organization')
       .leftJoinAndSelect('job.department', 'department')
-      .leftJoinAndSelect('job.position', 'position')
       .leftJoinAndSelect('job.creator', 'creator');
 
     if (filter.status) {

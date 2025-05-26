@@ -7,7 +7,6 @@ import {
   NumberField,
   StringField,
   StringFieldOptional,
-  UUIDField,
   UUIDFieldOptional,
 } from '@common/decorators/field.decorators';
 import { Uuid } from '@common/types/common.type';
@@ -16,10 +15,6 @@ import { SalaryRangeDto } from '../salary-range.dto';
 
 @Expose()
 export class CreateJobDto {
-  @StringField({ name: 'job_code' })
-  @Expose({ name: 'job_code' })
-  jobCode: string;
-
   @StringField()
   @Expose()
   title: string;
@@ -71,10 +66,6 @@ export class CreateJobDto {
   @UUIDFieldOptional({ name: 'department_id', default: null })
   @Expose({ name: 'department_id' })
   departmentId?: Uuid;
-
-  @UUIDField({ name: 'position_id' })
-  @Expose({ name: 'position_id' })
-  positionId: Uuid;
 
   organizationId: Uuid;
 

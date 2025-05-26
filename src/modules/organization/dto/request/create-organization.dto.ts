@@ -9,10 +9,13 @@ export class CreateOrganizationDto {
   @StringField()
   name: string;
 
+  @StringFieldOptional({ default: null })
+  description: string;
+
   @StringField()
   address: string;
 
-  @StringFieldOptional({ name: 'logo_url' })
+  @StringFieldOptional({ name: 'logo_url', default: null })
   @Expose({ name: 'logo_url' })
   logoUrl?: string;
 

@@ -1,9 +1,13 @@
 import { FAILURE, SUCCESS } from '@common/constants/app.constant';
+import { NumberField } from '@common/decorators/field.decorators';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResponseDataApi {
   @ApiPropertyOptional()
   status: string;
+
+  @NumberField()
+  statusCode: number;
 
   @ApiProperty()
   data: object;

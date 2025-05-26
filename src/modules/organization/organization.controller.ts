@@ -3,6 +3,7 @@ import { ApiAuth } from '@common/decorators/http.decorators';
 import { ValidateUuid } from '@common/decorators/validators/uuid-validator';
 import { ICurrentUser } from '@common/interfaces';
 import { Uuid } from '@common/types/common.type';
+import { LoginResDto } from '@modules/auth/dto/response/login.res.dto';
 import { CreateOrganizationUseCase } from '@modules/organization/use-cases/create-organization.use-case';
 import {
   Body,
@@ -49,17 +50,13 @@ export class OrganizationController {
   @ApiAuth({
     summary: 'Create a new organization',
     statusCode: HttpStatus.CREATED,
-    type: OrganizationResDto,
+    type: LoginResDto,
   })
   async create(
     @Body() dto: CreateOrganizationDto,
     @CurrentUser() currentUser: ICurrentUser,
   ) {
-    const result = await this.createOrganizationUseCase.execute(
-      dto,
-      currentUser,
-    );
-    return OrganizationMapper.toDto(result);
+    return this.createOrganizationUseCase.execute(dto, currentUser);
   }
 
   @Get()

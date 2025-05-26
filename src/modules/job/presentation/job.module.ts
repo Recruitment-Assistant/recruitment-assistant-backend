@@ -1,6 +1,5 @@
 import { ApplicationModule } from '@modules/application/application.module';
 import { DepartmentModule } from '@modules/department/presentation/department.module';
-import { PositionModule } from '@modules/position/presentation/position.module';
 import { Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JOB_REPOSITORY } from '../domain/constants';
@@ -20,7 +19,6 @@ const providers: Provider[] = [
 @Module({
   imports: [
     TypeOrmModule.forFeature([JobEntity]),
-    PositionModule,
     DepartmentModule,
     ApplicationModule,
   ],

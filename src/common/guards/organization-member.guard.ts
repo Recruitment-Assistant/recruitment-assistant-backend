@@ -21,7 +21,7 @@ export class OrganizationMemberGuard implements CanActivate {
       throw new UnauthorizedException('User not authenticated.');
     }
 
-    const currentOrganizationId = user.currentOrganizationId;
+    const currentOrganizationId = user.organizationId;
 
     if (!currentOrganizationId) {
       throw new ForbiddenException(

@@ -1,5 +1,4 @@
 import { Mapper } from '@/core/domain/mapper';
-import { PositionMapper } from '@/modules/position/application/mappers/position.mapper';
 import { DepartmentMapper } from '@modules/department/application/mappers/department.mapper';
 import { plainToInstance } from 'class-transformer';
 import { Job } from '../../domain/entities/job';
@@ -10,7 +9,6 @@ export class JobMapper implements Mapper<Job> {
   static toDomain(entity: JobEntity): Job {
     const job = new Job({
       id: entity.id,
-      jobCode: entity.jobCode,
       title: entity.title,
       description: entity.description,
       requirements: entity.requirements,
@@ -26,7 +24,6 @@ export class JobMapper implements Mapper<Job> {
       salaryRange: entity.salaryRange,
       organizationId: entity.organizationId,
       departmentId: entity.departmentId,
-      positionId: entity.positionId,
       createdBy: entity.createdBy,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
@@ -36,12 +33,11 @@ export class JobMapper implements Mapper<Job> {
     if (entity.organization) {
       job.organization = entity.organization;
     }
-    if (entity.position) {
-      job.position = PositionMapper.toDomain(entity.position);
-    }
+
     if (entity.creator) {
       job.creator = entity.creator;
     }
+
     if (entity.department) {
       job.department = DepartmentMapper.toDomain(entity.department);
     }
@@ -52,7 +48,6 @@ export class JobMapper implements Mapper<Job> {
   static toPersistent(domain: Job): JobEntity {
     const entity = new JobEntity({
       id: domain.id,
-      jobCode: domain.jobCode,
       title: domain.title,
       description: domain.description,
       requirements: domain.requirements,
@@ -68,7 +63,6 @@ export class JobMapper implements Mapper<Job> {
       salaryRange: domain.salaryRange,
       organizationId: domain.organizationId,
       departmentId: domain.departmentId,
-      positionId: domain.positionId,
       createdBy: domain.createdBy,
       createdAt: domain.createdAt,
       updatedAt: domain.updatedAt,
@@ -81,10 +75,6 @@ export class JobMapper implements Mapper<Job> {
 
     if (domain.department) {
       entity.department = DepartmentMapper.toPersistent(domain.department);
-    }
-
-    if (domain.position) {
-      domain.position = PositionMapper.toPersistent(domain.position);
     }
 
     if (domain.creator) {

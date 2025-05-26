@@ -1,7 +1,6 @@
 import { ErrorCode } from '@common/constants/error-code';
 import { Uuid } from '@common/types/common.type';
 import { Optional } from '@common/utils/optional';
-import { LoginCommand } from '@modules/auth/commands/login.command';
 import { SessionService } from '@modules/session/session.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
@@ -11,7 +10,7 @@ export class LogoutCommand implements ICommand {
 }
 
 @Injectable()
-@CommandHandler(LoginCommand)
+@CommandHandler(LogoutCommand)
 export class LogoutCommandHandler implements ICommandHandler<LogoutCommand> {
   constructor(private readonly sessionService: SessionService) {}
 

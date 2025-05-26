@@ -1,10 +1,15 @@
 import { ICurrentUser } from '@/common/interfaces';
-import { UserEntity } from '@/modules/user/entities/user.entity';
 import { Optional } from '@common/utils/optional';
+import { AuthService } from '@modules/auth/auth.service';
 import { CreateOrganizationDto } from '@modules/organization/dto/request/create-organization.dto';
 import { OrganizationEntity } from '@modules/organization/entities/organization.entity';
 import { OrganizationRepository } from '@modules/organization/repositories/organization.repository';
-import { ConflictException, Injectable } from '@nestjs/common';
+import { UserService } from '@modules/user/user.service';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { UserOrganizationRepository } from '../repositories/user-organization.repository';
 
 @Injectable()
@@ -12,6 +17,8 @@ export class CreateOrganizationUseCase {
   constructor(
     private readonly organizationRepository: OrganizationRepository,
     private readonly userOrganizationRepository: UserOrganizationRepository,
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {}
 
   async execute(dto: CreateOrganizationDto, currentUser: ICurrentUser) {
@@ -22,6 +29,14 @@ export class CreateOrganizationUseCase {
         createdBy: dto.createdBy,
       }),
     ).throwIfPresent(new ConflictException('Organization already exists'));
+
+    const user = await this.userService.findUserById(dto.createdBy, {
+      relations: ['roles'],
+    });
+
+    if (user.organizationId) {
+      throw new BadRequestException('User already has an organization');
+    }
 
     const org = new OrganizationEntity(dto);
     const savedOrg = await this.organizationRepository.save(org);
@@ -35,8 +50,10 @@ export class CreateOrganizationUseCase {
       },
       ['userId', 'organizationId'],
     );
-
-    savedOrg.createdByUser = currentUser as unknown as UserEntity;
-    return savedOrg;
+    await this.userService.updateUser(dto.createdBy, {
+      organizationId: savedOrg.id,
+    });
+    user.organizationId = savedOrg.id;
+    return this.authService.createToken(user, currentUser.sessionId);
   }
 }

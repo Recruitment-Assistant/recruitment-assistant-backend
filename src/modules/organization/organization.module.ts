@@ -1,6 +1,8 @@
+import { AuthModule } from '@modules/auth/auth.module';
 import { OrganizationEntity } from '@modules/organization/entities/organization.entity';
 import { OrganizationRepository } from '@modules/organization/repositories/organization.repository';
 import { CreateOrganizationUseCase } from '@modules/organization/use-cases/create-organization.use-case';
+import { UserModule } from '@modules/user/user.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserOrganizationEntity } from './entities/user-organization.entity';
@@ -30,6 +32,8 @@ const providers = [
 @Module({
   imports: [
     TypeOrmModule.forFeature([OrganizationEntity, UserOrganizationEntity]),
+    UserModule,
+    AuthModule,
   ],
   controllers: [OrganizationController],
   providers,

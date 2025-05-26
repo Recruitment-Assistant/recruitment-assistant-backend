@@ -24,8 +24,10 @@ export class ResponseInterceptor implements NestInterceptor {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
+    const statusCode = response.statusCode;
     return {
       status: SUCCESS,
+      statusCode,
       data: res?.data ? res?.data : res,
       meta: res?.meta ? res?.meta : undefined,
     };
