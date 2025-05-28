@@ -20,9 +20,11 @@ export class JobService {
   ) {}
 
   async createJob(dto: CreateJobDto) {
-    Optional.of(
-      await this.departmentRepository.findById(dto.departmentId),
-    ).throwIfNullable(new NotFoundException('Department not found'));
+    if (dto.departmentId) {
+      Optional.of(
+        await this.departmentRepository.findById(dto.departmentId),
+      ).throwIfNullable(new NotFoundException('Department not found'));
+    }
 
     const job = new Job(dto);
     return this.jobRepository.save(job);

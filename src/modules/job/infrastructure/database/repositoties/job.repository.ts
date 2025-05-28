@@ -5,9 +5,10 @@ import { Uuid } from '@common/types/common.type';
 import { JobMapper } from '@modules/job/application/mappers/job.mapper';
 import { IJobRepository } from '@modules/job/application/ports/job.repository.interface';
 import { Job } from '@modules/job/domain/entities/job';
+import { FilterJobDto } from '@modules/job/presentation/dto/request/filter-job.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Brackets, FindOptionsWhere, Repository } from 'typeorm';
 import { JobEntity } from '../entities/job.entity';
 
 @Injectable()
@@ -26,7 +27,7 @@ export class JobRepository implements IJobRepository {
   async findById(id: Uuid): Promise<Job | null> {
     const entity = await this.repository.findOne({
       where: { id },
-      relations: ['organization', 'department', 'position', 'creator'],
+      relations: ['organization', 'department', 'creator'],
     });
     return entity ? JobMapper.toDomain(entity) : null;
   }
@@ -38,7 +39,9 @@ export class JobRepository implements IJobRepository {
     return entities.map(JobMapper.toDomain);
   }
 
-  async findAll(filter: any): Promise<OffsetPaginatedDto<Job>> {
+  async findAll(filter: FilterJobDto): Promise<OffsetPaginatedDto<Job>> {
+    const searchCriteria = ['job.title', 'job.location', 'job.employmentType'];
+
     const queryBuilder = this.repository
       .createQueryBuilder('job')
       .leftJoinAndSelect('job.organization', 'organization')
@@ -53,6 +56,18 @@ export class JobRepository implements IJobRepository {
       queryBuilder.andWhere('job.organization_id = :organizationId', {
         organizationId: filter.organizationId,
       });
+    }
+
+    if (filter.keywords) {
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          for (const field of searchCriteria) {
+            qb.orWhere(`${field} ILIKE :keywords`, {
+              keywords: `%${filter.keywords}%`,
+            });
+          }
+        }),
+      );
     }
 
     const [entities, total] = await queryBuilder.getManyAndCount();
