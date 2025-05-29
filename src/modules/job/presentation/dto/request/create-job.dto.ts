@@ -6,7 +6,6 @@ import {
   EnumField,
   NumberField,
   StringField,
-  StringFieldOptional,
   UUIDFieldOptional,
 } from '@common/decorators/field.decorators';
 import { Uuid } from '@common/types/common.type';
@@ -27,9 +26,9 @@ export class CreateJobDto {
   @Expose()
   requirements: string;
 
-  @StringFieldOptional({ isArray: true, each: true })
+  @StringField({ isArray: true, each: true, minItems: 1 })
   @Expose()
-  tags?: string[];
+  tags: string[];
 
   @StringField()
   @Expose()

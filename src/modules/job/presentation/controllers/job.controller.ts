@@ -32,13 +32,13 @@ import { diskStorage } from 'multer';
 import path, { extname } from 'path';
 import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { JobMapper } from '../application/mappers/job.mapper';
-import { JobService } from '../domain/services/job.service';
-import { CreateJobDto } from './dto/request/create-job.dto';
-import { FilterJobDto } from './dto/request/filter-job.dto';
-import { JobStatusDto } from './dto/request/job-status.dto';
-import { UpdateJobDto } from './dto/request/update-job.dto';
-import { JobResDto } from './dto/response/job.res.dto';
+import { JobMapper } from '../../application/mappers/job.mapper';
+import { JobService } from '../../domain/services/job.service';
+import { CreateJobDto } from '../dto/request/create-job.dto';
+import { FilterJobDto } from '../dto/request/filter-job.dto';
+import { JobStatusDto } from '../dto/request/job-status.dto';
+import { UpdateJobDto } from '../dto/request/update-job.dto';
+import { JobResDto } from '../dto/response/job.res.dto';
 
 @Controller({ path: 'jobs', version: '1' })
 @ApiTags('Job APIs')

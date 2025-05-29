@@ -3,8 +3,8 @@ import { ApiAuth } from '@common/decorators/http.decorators';
 import { Uuid } from '@common/types/common.type';
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ApplicationService } from './application.service';
-import { FilterApplicationDto } from './dto/filter-application.dto';
+import { ApplicationService } from '../application.service';
+import { FilterApplicationDto } from '../dto/filter-application.dto';
 
 @Controller({ path: 'applications', version: '1' })
 @ApiTags('Application APIs')

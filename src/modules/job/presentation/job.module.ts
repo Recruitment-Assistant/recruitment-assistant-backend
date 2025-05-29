@@ -6,7 +6,7 @@ import { JOB_REPOSITORY } from '../domain/constants';
 import { JobService } from '../domain/services/job.service';
 import { JobEntity } from '../infrastructure/database/entities/job.entity';
 import { JobRepository } from '../infrastructure/database/repositoties/job.repository';
-import { JobController } from './job.controller';
+import { JobController } from './controllers/job.controller';
 
 const providers: Provider[] = [
   JobService,

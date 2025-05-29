@@ -15,7 +15,7 @@ To run tests in a specific file, use the following command:
 ```bash
 npm test path/to/file
 
-# example: npm test src/api/auth/auth.controller.spec.ts
+# example: npm test src/api/auth/auth.controllers.spec.ts
 ```
 
 ## Integration Testing
