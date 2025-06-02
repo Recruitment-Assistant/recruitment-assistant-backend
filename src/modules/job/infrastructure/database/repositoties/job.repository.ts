@@ -40,7 +40,12 @@ export class JobRepository implements IJobRepository {
   }
 
   async findAll(filter: FilterJobDto): Promise<OffsetPaginatedDto<Job>> {
-    const searchCriteria = ['job.title', 'job.location', 'job.employmentType'];
+    const searchCriteria = [
+      'job.title',
+      'job.location',
+      'job.employmentType',
+      'organization.name',
+    ];
 
     const queryBuilder = this.repository
       .createQueryBuilder('job')
@@ -49,7 +54,9 @@ export class JobRepository implements IJobRepository {
       .leftJoinAndSelect('job.creator', 'creator');
 
     if (filter.status) {
-      queryBuilder.andWhere('job.status = :status', { status: filter.status });
+      queryBuilder.andWhere('job.status IN (:...status)', {
+        status: filter.status,
+      });
     }
 
     if (filter.organizationId) {

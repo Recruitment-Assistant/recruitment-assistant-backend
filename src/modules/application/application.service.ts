@@ -62,7 +62,7 @@ export class ApplicationService {
     jobId: Uuid;
     resumeText: string;
     resume: FileEntity;
-    user: ICurrentUser;
+    user?: ICurrentUser;
   }) {
     const candidateId = uuidv4() as Uuid;
     const applicationId = uuidv4() as Uuid;

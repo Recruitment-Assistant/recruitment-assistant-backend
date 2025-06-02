@@ -1,3 +1,4 @@
+import { ApplyJobCommandHandler } from '@modules/application/commands/apply-job.command';
 import { CandidateModule } from '@modules/candidate/candidate.module';
 import { FileModule } from '@modules/file/file.module';
 import { LlmModule } from '@modules/llm/llm.module';
@@ -15,8 +16,16 @@ import { ResumeAnalysisLogRepository } from './repositories/resume-analysis-log.
 import { UploadResumeByJobIdUseCase } from './use-cases/upload-resume-by-job-id.use-case';
 
 const providers = [
-  ApplicationService,
+  // use cases
   UploadResumeByJobIdUseCase,
+
+  // commands
+  ApplyJobCommandHandler,
+
+  // services
+  ApplicationService,
+
+  // adapters
   {
     provide: RESUME_PARSER_PORT,
     useClass: ResumeParserAdapter,
@@ -25,6 +34,8 @@ const providers = [
     provide: RESUME_ANALYZER_PORT,
     useClass: ResumeAnalyzerAdapter,
   },
+
+  // repositories
   ApplicationRepository,
   ResumeAnalysisLogRepository,
 ];

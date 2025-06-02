@@ -4,6 +4,7 @@ import {
   StringFieldOptional,
 } from '@common/decorators/field.decorators';
 import { Uuid } from '@common/types/common.type';
+import { FileEntity } from '@database/entities/file.entity';
 import { Expose } from 'class-transformer';
 import { CANDIDATE_SOURCE, GENDER_CANDIDATE } from '../constant';
 
@@ -77,9 +78,9 @@ export class CreateCandidateDto {
   @Expose()
   summary?: string;
 
-  @StringFieldOptional({ name: 'resume_url' })
-  @Expose({ name: 'resume_url' })
-  resumeUrl?: string;
+  @StringFieldOptional()
+  @Expose()
+  resume?: FileEntity;
 
   @EnumFieldOptional(() => CANDIDATE_SOURCE)
   @Expose()

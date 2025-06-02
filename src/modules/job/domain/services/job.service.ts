@@ -5,6 +5,7 @@ import { Optional } from '@common/utils/optional';
 import { DEPARTMENT_REPOSITORY } from '@modules/department/domain/constants';
 import { IJobRepository } from '@modules/job/application/ports/job.repository.interface';
 import { CreateJobDto } from '@modules/job/presentation/dto/request/create-job.dto';
+import { FilterJobDto } from '@modules/job/presentation/dto/request/filter-job.dto';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { JOB_REPOSITORY } from '../constants';
@@ -30,7 +31,7 @@ export class JobService {
     return this.jobRepository.save(job);
   }
 
-  async getAllJobs(filter: any) {
+  async getAllJobs(filter: FilterJobDto) {
     return this.jobRepository.findAll(filter);
   }
 
