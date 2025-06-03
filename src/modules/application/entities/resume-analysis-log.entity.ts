@@ -61,7 +61,7 @@ export class ResumeAnalysisLogEntity extends AbstractEntity {
   @Column('timestamptz', { name: 'analyzed_at', default: () => 'now()' })
   analyzedAt!: Date;
 
-  @OneToOne(() => ApplicationEntity, { onDelete: 'CASCADE' })
+  @OneToOne(() => ApplicationEntity, (application) => application.resumeLog)
   @JoinColumn({
     name: 'application_id',
     referencedColumnName: 'id',

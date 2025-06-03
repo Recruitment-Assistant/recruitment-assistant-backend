@@ -17,7 +17,6 @@ import * as fs from 'fs';
 import PdfParse from 'pdf-parse';
 import { Observable, Subject } from 'rxjs';
 import { FindManyOptions, In } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { RESUME_ANALYZER_PORT, RESUME_PARSER_PORT } from './constants';
 import { generateJDtext } from './constants/prompt-analysis-resume.constant';
 import { FilterApplicationDto } from './dto/filter-application.dto';
@@ -56,6 +55,7 @@ export class ApplicationService {
     resumeText,
     resume,
     user,
+    organizationId,
   }: {
     resumeData: ResumeData;
     analysisResult: AnalysisResult;
@@ -63,15 +63,12 @@ export class ApplicationService {
     resumeText: string;
     resume: FileEntity;
     user?: ICurrentUser;
+    organizationId: Uuid;
   }) {
-    const candidateId = uuidv4() as Uuid;
-    const applicationId = uuidv4() as Uuid;
-
-    await this.candidateRepository.save(
+    const candidateSaved = await this.candidateRepository.createOrUpdate(
       new CandidateEntity({
-        id: candidateId,
-        organizationId: user.organizationId,
-        createdBy: user.id,
+        organizationId,
+        createdBy: user?.id,
         fullName: resumeData.full_name,
         email: resumeData.email,
         phoneNumber: resumeData.phone,
@@ -100,11 +97,10 @@ export class ApplicationService {
       }),
     );
 
-    await this.applicationRepository.save(
+    const applicationSaved = await this.applicationRepository.upsert(
       new ApplicationEntity({
-        id: applicationId,
-        organizationId: user.organizationId,
-        candidateId,
+        organizationId,
+        candidateId: candidateSaved.id,
         jobId,
         resume: resume,
         rawResumeText: resumeText,
@@ -116,12 +112,12 @@ export class ApplicationService {
         status: 'NEW',
         currentStage: 'SCREENING',
       }),
+      { conflictPaths: ['candidateId', 'jobId'] },
     );
 
     await this.resumeLogRepository.save(
       new ResumeAnalysisLogEntity({
-        id: uuidv4() as Uuid,
-        applicationId,
+        applicationId: applicationSaved.identifiers[0].id as Uuid,
         aiSummary: analysisResult.ai_summary,
         selected: analysisResult.selected,
         scoreResumeMatch: analysisResult.score_resume_match,
@@ -132,8 +128,6 @@ export class ApplicationService {
         analyzedAt: new Date(),
       }),
     );
-
-    return { candidateId, applicationId };
   }
 
   async handleAnalysisOneResume(
@@ -180,6 +174,7 @@ export class ApplicationService {
         resumeText,
         resume: resumeUpload,
         user,
+        organizationId: job.organizationId,
       });
 
       sendProgress({ type: 'complete', payload: result }, 'complete');
@@ -209,7 +204,7 @@ export class ApplicationService {
     const filterOptions: FindManyOptions<ApplicationEntity> = {
       where: {
         organizationId: query.ogranizationId,
-        id: query.id ? In(query.id) : undefined,
+        // id: query.id ? In(query.id) : undefined,
         jobId: query.jobId ? In(query.jobId) : undefined,
       },
     };

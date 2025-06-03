@@ -7,6 +7,7 @@ import { ValidateUuid } from '@common/decorators/validators/uuid-validator';
 import { OffsetPaginatedDto } from '@common/dto/offset-pagination/paginated.dto';
 import { ValidationException } from '@common/exceptions/validation.exception';
 import { Uuid } from '@common/types/common.type';
+import { ApplyJobCommand } from '@modules/application/commands/apply-job.command';
 import { ApplyJobDto } from '@modules/application/dto/apply.job.dto';
 import { JobMapper } from '@modules/job/application/mappers/job.mapper';
 import { JobService } from '@modules/job/domain/services/job.service';
@@ -23,6 +24,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
@@ -33,7 +35,10 @@ import { v4 as uuidv4 } from 'uuid';
 @ApiTags('Job Public APIs')
 @Public()
 export class JobPublicController {
-  constructor(private readonly jobService: JobService) {}
+  constructor(
+    private readonly jobService: JobService,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   @Get()
   @ApiPublic({
@@ -72,7 +77,7 @@ export class JobPublicController {
   @Post(':jobId/apply')
   @ApiPublic({
     summary: 'Apply job',
-    statusCode: HttpStatus.CREATED,
+    statusCode: HttpStatus.NO_CONTENT,
   })
   @ApiParam({
     name: 'jobId',
@@ -85,7 +90,6 @@ export class JobPublicController {
       storage: diskStorage({
         destination: './src/uploads',
         filename: (_req, file, cb) => {
-          console.log('check file: ', file);
           const fileName = `${uuidv4()}${extname(file.originalname)}`;
           cb(null, fileName);
         },
@@ -111,10 +115,6 @@ export class JobPublicController {
     @Body() dto: ApplyJobDto,
     @UploadedFile() resume: Express.Multer.File,
   ) {
-    console.log('check file: ', resume);
-    return {
-      jobId,
-      resume,
-    };
+    this.commandBus.execute(new ApplyJobCommand(jobId, dto, resume));
   }
 }

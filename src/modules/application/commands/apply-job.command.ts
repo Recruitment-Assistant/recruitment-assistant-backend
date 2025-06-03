@@ -50,30 +50,38 @@ export class ApplyJobCommandHandler
 
   async execute(command: ApplyJobCommand) {
     const { resume, jobId, dto } = command;
+    try {
+      const job =
+        command.job ??
+        (await this.eventService.emitAsync(new GetJobByIdEvent(jobId)));
 
-    const job =
-      command.job ??
-      (await this.eventService.emitAsync(new GetJobByIdEvent(jobId)));
+      const dataBuffer = fs.readFileSync(resume.path);
+      resume.buffer = resume.buffer ?? dataBuffer;
+      const pdfData = await PdfParse(dataBuffer);
+      const resumeText = pdfData.text;
 
-    const dataBuffer = fs.readFileSync(resume.path);
-    resume.buffer = resume.buffer ?? dataBuffer;
-    const pdfData = await PdfParse(dataBuffer);
-    const resumeText = pdfData.text;
+      const resumeUpload: FileInfoResDto =
+        await this.fileService.handleFileUpload(resume);
 
-    const resumeUpload: FileInfoResDto =
-      await this.fileService.handleFileUpload(resume);
+      const resumeData = await this.parser.parse(dataBuffer);
 
-    const resumeData = await this.parser.parse(dataBuffer);
+      const JD_TEXT = generateJDtext(job.description, job.requirements);
+      const analysisResult = await this.analyzer.analyze(JD_TEXT, resumeText);
 
-    const JD_TEXT = generateJDtext(job.description, job.requirements);
-    const analysisResult = await this.analyzer.analyze(JD_TEXT, resumeText);
-
-    const result = await this.applicationService.saveAnalysisResults({
-      analysisResult,
-      resumeData,
-      jobId,
-      resumeText,
-      resume: resumeUpload,
-    });
+      const result = await this.applicationService.saveAnalysisResults({
+        analysisResult,
+        resumeData,
+        jobId,
+        resumeText,
+        resume: resumeUpload,
+        organizationId: job.organizationId,
+      });
+    } catch (error) {
+      console.error('Error applying for job:', error);
+    } finally {
+      fs.unlink(resume.path, (err) => {
+        if (err) console.error(`Failed to delete file ${resume.path}:`, err);
+      });
+    }
   }
 }

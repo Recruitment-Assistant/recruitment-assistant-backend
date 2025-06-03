@@ -107,9 +107,6 @@ export class ApplicationEntity extends AbstractEntity {
   })
   referrer?: Relation<UserEntity>;
 
-  @OneToOne(() => ResumeAnalysisLogEntity, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @OneToOne(() => ResumeAnalysisLogEntity, (log) => log.application)
   resumeLog: ResumeAnalysisLogEntity;
 }

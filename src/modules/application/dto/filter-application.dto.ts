@@ -8,9 +8,11 @@ import { IsUUID } from 'class-validator';
 export class FilterApplicationDto extends PageOptionsDto {
   @StringFieldOptional({ each: true, isArray: true })
   @Expose()
-  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   @IsUUID('4', { each: true })
-  id: string[];
+  @Transform(({ value }) =>
+    value && typeof value === 'string' ? [value] : value,
+  )
+  id?: string[];
 
   @StringFieldOptional({
     each: true,
