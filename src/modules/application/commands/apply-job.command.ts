@@ -1,32 +1,27 @@
 import { EventService } from '@common/events/event.service';
 import { Uuid } from '@common/types/common.type';
 import { ApplicationService } from '@modules/application/application.service';
-import {
-  RESUME_ANALYZER_PORT,
-  RESUME_PARSER_PORT,
-} from '@modules/application/constants';
-import { generateJDtext } from '@modules/application/constants/prompt-analysis-resume.constant';
 import { ApplyJobDto } from '@modules/application/dto/apply.job.dto';
-import { ResumeAnalyzerPort } from '@modules/application/ports/resume-analyzer.port';
-import { ResumeParserPort } from '@modules/application/ports/resume-parser.port';
 import { ApplicationRepository } from '@modules/application/repositories/application.repository';
 import { ResumeAnalysisLogRepository } from '@modules/application/repositories/resume-analysis-log.repository';
+import { CandidateEntity } from '@modules/candidate/entities/candidate.entity';
 import { CandidateRepository } from '@modules/candidate/repositories/candidate.repository';
-import { FileInfoResDto } from '@modules/file/dto/file-info.res.dto';
 import { FileService } from '@modules/file/file.service';
 import { Job } from '@modules/job/domain/entities/job';
 import { GetJobByIdEvent } from '@modules/job/domain/events/get-job-by-id.event';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import fs from 'fs';
-import PdfParse from 'pdf-parse';
+import { ApplicationEntity } from '../entities/application.entity';
+import { ResumeAnalysisLogEntity } from '../entities/resume-analysis-log.entity';
+import { IPayloadCreateApplication } from '../types';
 
 export class ApplyJobCommand implements ICommand {
   constructor(
     public readonly jobId: Uuid,
     public readonly dto: ApplyJobDto,
     public readonly resume: Express.Multer.File,
-    public readonly job?: Job,
+    public job?: Job,
   ) {}
 }
 
@@ -41,10 +36,6 @@ export class ApplyJobCommandHandler
     private readonly applicationRepository: ApplicationRepository,
     private readonly resumeLogRepository: ResumeAnalysisLogRepository,
     private readonly fileService: FileService,
-    @Inject(RESUME_PARSER_PORT)
-    private readonly parser: ResumeParserPort,
-    @Inject(RESUME_ANALYZER_PORT)
-    private readonly analyzer: ResumeAnalyzerPort,
     private readonly applicationService: ApplicationService,
   ) {}
 
@@ -54,34 +45,133 @@ export class ApplyJobCommandHandler
       const job =
         command.job ??
         (await this.eventService.emitAsync(new GetJobByIdEvent(jobId)));
+      dto.organizationId = job.organizationId;
 
-      const dataBuffer = fs.readFileSync(resume.path);
-      resume.buffer = resume.buffer ?? dataBuffer;
-      const pdfData = await PdfParse(dataBuffer);
-      const resumeText = pdfData.text;
+      const { candidate, resumeText } =
+        await this.getOrCreateCandidate(command);
 
-      const resumeUpload: FileInfoResDto =
-        await this.fileService.handleFileUpload(resume);
+      const applicationExist = await this.applicationRepository.findOneBy({
+        candidateId: candidate?.id,
+        jobId,
+      });
 
-      const resumeData = await this.parser.parse(dataBuffer);
+      if (applicationExist) {
+        return;
+      }
 
-      const JD_TEXT = generateJDtext(job.description, job.requirements);
-      const analysisResult = await this.analyzer.analyze(JD_TEXT, resumeText);
+      const analysisResult = await this.applicationService.analyzeResume(
+        job,
+        resumeText,
+      );
 
-      const result = await this.applicationService.saveAnalysisResults({
+      await this.saveApplication({
         analysisResult,
-        resumeData,
         jobId,
         resumeText,
-        resume: resumeUpload,
-        organizationId: job.organizationId,
+        resume: candidate.resume,
+        organizationId: dto.organizationId,
+        candidateId: candidate.id,
       });
     } catch (error) {
       console.error('Error applying for job:', error);
     } finally {
-      fs.unlink(resume.path, (err) => {
-        if (err) console.error(`Failed to delete file ${resume.path}:`, err);
-      });
+      if (resume && resume.path && !resume.buffer) {
+        fs.unlink(resume.path, (err) => {
+          if (err) console.error(`Failed to delete file ${resume.path}:`, err);
+        });
+      }
     }
+  }
+
+  private async getOrCreateCandidate(command: ApplyJobCommand) {
+    const { dto, resume } = command;
+
+    const existing = await this.candidateRepository.findOneBy({
+      email: dto.email,
+      organizationId: dto.organizationId,
+    });
+
+    if (existing) {
+      return { candidate: existing, resumeText: null };
+    }
+
+    const { resumeText, resumeData, resumeUpload } =
+      await this.applicationService.parseResume(resume);
+
+    const newCandidate = await this.candidateRepository.createOrUpdate(
+      new CandidateEntity({
+        organizationId: dto.organizationId,
+        fullName: resumeData.full_name,
+        email: resumeData.email,
+        phoneNumber: dto.phone_number || resumeData.phone,
+        address: resumeData.address,
+        linkedinProfile: resumeData.linkedin,
+        education: resumeData.education?.map((e) => ({
+          school: e.school,
+          degree: e.degree,
+          major: e.major,
+          startDate: e.start_date,
+          endDate: e.end_date,
+        })),
+        workExperience: resumeData.work_experience?.map((w) => ({
+          company: w.company,
+          position: w.position,
+          startDate: w.start_date,
+          endDate: w.end_date,
+          description: w.description,
+        })),
+        skills: resumeData.skills,
+        languages: resumeData.languages,
+        certifications: resumeData.certifications,
+        summary: resumeData.summary,
+        source: 'UPLOAD',
+        resume: resumeUpload,
+      }),
+    );
+
+    return { candidate: newCandidate, resumeText };
+  }
+
+  private async saveApplication(payload: IPayloadCreateApplication) {
+    const {
+      analysisResult,
+      jobId,
+      resumeText,
+      resume,
+      organizationId,
+      candidateId,
+    } = payload;
+
+    const applicationSaved = await this.applicationRepository.upsert(
+      new ApplicationEntity({
+        organizationId,
+        candidateId,
+        jobId,
+        resume,
+        rawResumeText: resumeText,
+        screeningScore: analysisResult.score_resume_match,
+        scoreResumeMatch: analysisResult.score_resume_match,
+        screeningNote: analysisResult.feedback,
+        appliedAt: new Date(),
+        source: 'UPLOAD',
+        status: 'NEW',
+        currentStage: 'SCREENING',
+      }),
+      { conflictPaths: ['candidateId', 'jobId'] },
+    );
+
+    await this.resumeLogRepository.save(
+      new ResumeAnalysisLogEntity({
+        applicationId: applicationSaved.identifiers[0].id as Uuid,
+        aiSummary: analysisResult.ai_summary,
+        selected: analysisResult.selected,
+        scoreResumeMatch: analysisResult.score_resume_match,
+        experienceLevel: analysisResult.experience_level,
+        feedback: analysisResult.feedback,
+        matchingSkills: analysisResult.matching_skills,
+        missingSkills: analysisResult.missing_skills,
+        analyzedAt: new Date(),
+      }),
+    );
   }
 }

@@ -7,6 +7,7 @@ import {
   StringField,
   StringFieldOptional,
 } from '@common/decorators/field.decorators';
+import { Uuid } from '@common/types/common.type';
 import {
   SALARY_CURRENCY,
   SALARY_INTERVAL,
@@ -42,4 +43,6 @@ export class ApplyJobDto {
 
   @StringFieldOptional()
   cover_letter: string;
+
+  organizationId: Uuid;
 }

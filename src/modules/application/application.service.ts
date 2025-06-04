@@ -9,6 +9,7 @@ import { CandidateEntity } from '@modules/candidate/entities/candidate.entity';
 import { CandidateRepository } from '@modules/candidate/repositories/candidate.repository';
 import { FileInfoResDto } from '@modules/file/dto/file-info.res.dto';
 import { FileService } from '@modules/file/file.service';
+import { Job } from '@modules/job/domain/entities/job';
 import { GetJobByIdEvent } from '@modules/job/domain/events/get-job-by-id.event';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
@@ -47,6 +48,26 @@ export class ApplicationService {
     @Inject(CACHE_MANAGER)
     private readonly cacheService: Cache,
   ) {}
+
+  async parseResume(resume: Express.Multer.File) {
+    const dataBuffer = fs.readFileSync(resume.path);
+    resume.buffer = resume.buffer ?? dataBuffer;
+
+    const resumeUpload: FileInfoResDto =
+      await this.fileService.handleFileUpload(resume);
+
+    const pdfData = await PdfParse(dataBuffer);
+    const resumeText = pdfData.text;
+
+    const resumeData = await this.parser.parse(dataBuffer);
+
+    return { resumeText, resumeData, resumeUpload };
+  }
+
+  async analyzeResume(job: Job, resumeText: string) {
+    const JD_TEXT = generateJDtext(job.description, job.requirements);
+    return this.analyzer.analyze(JD_TEXT, resumeText);
+  }
 
   async saveAnalysisResults({
     resumeData,
