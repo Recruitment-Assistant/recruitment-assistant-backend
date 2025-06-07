@@ -4,12 +4,14 @@ import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { OrganizationEntity } from '@/modules/organization/entities/organization.entity';
 import { UserEntity } from '@/modules/user/entities/user.entity';
 import { DepartmentEntity } from '@modules/department/infrastructure/database/entities/department.entity';
+import { PipelineEntity } from '@modules/pipeline/entities/pipeline.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
 } from 'typeorm';
 
 @Entity('job', { schema: 'public' })
@@ -29,6 +31,9 @@ export class JobEntity extends AbstractEntity {
 
   @Column('uuid', { name: 'department_id' })
   departmentId!: Uuid;
+
+  @Column('uuid')
+  pipeline_id!: Uuid;
 
   @Column('uuid', { name: 'created_by' })
   createdBy!: Uuid;
@@ -63,9 +68,6 @@ export class JobEntity extends AbstractEntity {
   @Column('boolean', { name: 'remote_eligible', default: false })
   remoteEligible!: boolean;
 
-  @Column('integer', { name: 'applicants_count', default: 0 })
-  applicantsCount!: number;
-
   @Column('varchar', { name: 'employment_type' })
   employmentType!: EMPLOYMENT_TYPE;
 
@@ -87,6 +89,14 @@ export class JobEntity extends AbstractEntity {
     foreignKeyConstraintName: 'FK_job_department_id',
   })
   department?: DepartmentEntity;
+
+  @ManyToOne(() => PipelineEntity)
+  @JoinColumn({
+    name: 'pipeline_id',
+    referencedColumnName: 'id',
+    foreignKeyConstraintName: 'FK_job_pipeline_id',
+  })
+  pipeline?: Relation<PipelineEntity>;
 
   @ManyToOne(() => UserEntity)
   @JoinColumn({

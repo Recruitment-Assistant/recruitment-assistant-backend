@@ -40,8 +40,6 @@ export class Job extends BaseEntity {
 
   remoteEligible: boolean = false;
 
-  applicantsCount: number = 0;
-
   employmentType!: EMPLOYMENT_TYPE;
 
   salaryRange?: SalaryRange;
@@ -49,6 +47,8 @@ export class Job extends BaseEntity {
   organizationId: Uuid;
 
   departmentId?: Uuid;
+
+  pipeline_id: Uuid;
 
   createdBy!: Uuid;
 

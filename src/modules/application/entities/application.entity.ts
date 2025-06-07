@@ -4,6 +4,7 @@ import { FileEntity } from '@database/entities/file.entity';
 import { CandidateEntity } from '@modules/candidate/entities/candidate.entity';
 import { JobEntity } from '@modules/job/infrastructure/database/entities/job.entity';
 import { OrganizationEntity } from '@modules/organization/entities/organization.entity';
+import { StageEntity } from '@modules/stage/entities/stage.entity';
 import { UserEntity } from '@modules/user/entities/user.entity';
 import {
   Column,
@@ -60,14 +61,14 @@ export class ApplicationEntity extends AbstractEntity {
   @Column('integer', { name: 'score_resume_match', nullable: true })
   scoreResumeMatch?: number;
 
-  @Column('varchar', { name: 'current_stage', nullable: true })
-  currentStage?: string;
+  @Column('uuid', { name: 'current_stage_id', nullable: true })
+  currentStageId?: Uuid;
 
   @Column('varchar', { nullable: true })
   status?: string;
 
-  @Column('decimal', { name: 'expected_salary', nullable: true })
-  expectedSalary?: number;
+  @Column('jsonb', { name: 'expected_salary', nullable: true })
+  expectedSalary?: Record<string, any>;
 
   @Column('uuid', { name: 'referred_by', nullable: true })
   referredBy?: Uuid;
@@ -98,6 +99,14 @@ export class ApplicationEntity extends AbstractEntity {
     foreignKeyConstraintName: 'FK_application_job_id',
   })
   job!: Relation<JobEntity>;
+
+  @ManyToOne(() => StageEntity)
+  @JoinColumn({
+    name: 'current_stage_id',
+    referencedColumnName: 'id',
+    foreignKeyConstraintName: 'FK_application_current_stage_id',
+  })
+  currentStage: StageEntity;
 
   @ManyToOne(() => UserEntity)
   @JoinColumn({

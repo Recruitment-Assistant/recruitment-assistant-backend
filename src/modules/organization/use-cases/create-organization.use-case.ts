@@ -1,9 +1,11 @@
 import { ICurrentUser } from '@/common/interfaces';
+import { EventService } from '@common/events/event.service';
 import { Optional } from '@common/utils/optional';
 import { AuthService } from '@modules/auth/auth.service';
 import { CreateOrganizationDto } from '@modules/organization/dto/request/create-organization.dto';
 import { OrganizationEntity } from '@modules/organization/entities/organization.entity';
 import { OrganizationRepository } from '@modules/organization/repositories/organization.repository';
+import { OrganizationCreatedEvent } from '@modules/pipeline/events/organization-created.event';
 import { UserService } from '@modules/user/user.service';
 import {
   BadRequestException,
@@ -19,6 +21,7 @@ export class CreateOrganizationUseCase {
     private readonly userOrganizationRepository: UserOrganizationRepository,
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly eventService: EventService,
   ) {}
 
   async execute(dto: CreateOrganizationDto, currentUser: ICurrentUser) {
@@ -54,6 +57,8 @@ export class CreateOrganizationUseCase {
       organizationId: savedOrg.id,
     });
     user.organizationId = savedOrg.id;
+
+    this.eventService.emit(new OrganizationCreatedEvent(savedOrg.id));
     return this.authService.createToken(user, currentUser.sessionId);
   }
 }

@@ -131,7 +131,7 @@ export class ApplicationService {
         appliedAt: new Date(),
         source: 'UPLOAD',
         status: 'NEW',
-        currentStage: 'SCREENING',
+        // currentStage: 'SCREENING',
       }),
       { conflictPaths: ['candidateId', 'jobId'] },
     );
