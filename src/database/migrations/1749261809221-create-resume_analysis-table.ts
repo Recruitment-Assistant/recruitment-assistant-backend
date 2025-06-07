@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateResumeAnalysisLogTable1747335363265
+export class CreateResumeAnalysisTable1749261809221
   implements MigrationInterface
 {
-  name = 'CreateResumeAnalysisLogTable1747335363265';
-  tableName = 'resume_analysis_log';
+  name = 'CreateResumeAnalysisTable1749261809221';
+  tableName = 'resume_analysis';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -26,13 +26,13 @@ export class CreateResumeAnalysisLogTable1747335363265
         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "deleted_at" TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-        CONSTRAINT "PK_resume_analysis_log_id" PRIMARY KEY ("id")
+        CONSTRAINT "PK_resume_analysis_id" PRIMARY KEY ("id")
       )
     `);
 
     await queryRunner.query(`
       ALTER TABLE "${this.tableName}"
-      ADD CONSTRAINT "FK_resume_analysis_log_application_id"
+      ADD CONSTRAINT "FK_resume_analysis_application_id"
       FOREIGN KEY ("application_id") REFERENCES "application"("id")
       ON DELETE CASCADE ON UPDATE CASCADE
     `);
@@ -40,7 +40,7 @@ export class CreateResumeAnalysisLogTable1747335363265
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-      ALTER TABLE "${this.tableName}" DROP CONSTRAINT "FK_resume_analysis_log_application_id"
+      ALTER TABLE "${this.tableName}" DROP CONSTRAINT "FK_resume_analysis_application_id"
     `);
 
     await queryRunner.query(`

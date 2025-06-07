@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateCandidateTable1747330941382 implements MigrationInterface {
-  name = 'CreateCandidateTable1747330941382';
+export class CreateCandidateTable1749261495611 implements MigrationInterface {
+  name = 'CreateCandidateTable1749261495611';
   tableName = 'candidate';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -41,17 +41,17 @@ export class CreateCandidateTable1747330941382 implements MigrationInterface {
   `);
 
     await queryRunner.query(`
-        ALTER TABLE "${this.tableName}"
-        ADD CONSTRAINT "FK_candidate_organization_id"
-        FOREIGN KEY ("organization_id") REFERENCES "organization"("id")
-        ON DELETE SET NULL ON UPDATE NO ACTION
+      ALTER TABLE "${this.tableName}"
+      ADD CONSTRAINT "FK_candidate_organization_id"
+      FOREIGN KEY ("organization_id") REFERENCES "organization"("id")
+      ON DELETE SET NULL ON UPDATE NO ACTION
     `);
 
     await queryRunner.query(`
-        ALTER TABLE "${this.tableName}"
-        ADD CONSTRAINT "FK_candidate_created_by"
-        FOREIGN KEY ("created_by") REFERENCES "user"("id")
-        ON DELETE SET NULL ON UPDATE NO ACTION
+      ALTER TABLE "${this.tableName}"
+      ADD CONSTRAINT "FK_candidate_created_by"
+      FOREIGN KEY ("created_by") REFERENCES "user"("id")
+      ON DELETE SET NULL ON UPDATE NO ACTION
     `);
   }
 

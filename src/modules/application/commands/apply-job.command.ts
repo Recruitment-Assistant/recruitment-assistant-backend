@@ -13,7 +13,7 @@ import { Injectable } from '@nestjs/common';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import fs from 'fs';
 import { ApplicationEntity } from '../entities/application.entity';
-import { ResumeAnalysisLogEntity } from '../entities/resume-analysis-log.entity';
+import { ResumeAnalysisEntity } from '../entities/resume-analysis.entity';
 import { IPayloadCreateApplication } from '../types';
 
 export class ApplyJobCommand implements ICommand {
@@ -34,7 +34,7 @@ export class ApplyJobCommandHandler
     private readonly eventService: EventService,
     private readonly candidateRepository: CandidateRepository,
     private readonly applicationRepository: ApplicationRepository,
-    private readonly resumeLogRepository: ResumeAnalysisLogRepository,
+    private readonly resumeAnalysisRepository: ResumeAnalysisLogRepository,
     private readonly fileService: FileService,
     private readonly applicationService: ApplicationService,
   ) {}
@@ -160,8 +160,8 @@ export class ApplyJobCommandHandler
       { conflictPaths: ['candidateId', 'jobId'] },
     );
 
-    await this.resumeLogRepository.save(
-      new ResumeAnalysisLogEntity({
+    await this.resumeAnalysisRepository.save(
+      new ResumeAnalysisEntity({
         applicationId: applicationSaved.identifiers[0].id as Uuid,
         aiSummary: analysisResult.ai_summary,
         selected: analysisResult.selected,

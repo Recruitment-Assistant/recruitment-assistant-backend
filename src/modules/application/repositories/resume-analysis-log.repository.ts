@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { ResumeAnalysisLogEntity } from '../entities/resume-analysis-log.entity';
+import { ResumeAnalysisEntity } from '../entities/resume-analysis.entity';
 
 @Injectable()
-export class ResumeAnalysisLogRepository extends Repository<ResumeAnalysisLogEntity> {
+export class ResumeAnalysisLogRepository extends Repository<ResumeAnalysisEntity> {
   constructor(private readonly dataSource: DataSource) {
-    super(ResumeAnalysisLogEntity, dataSource.createEntityManager());
+    super(ResumeAnalysisEntity, dataSource.createEntityManager());
   }
 }

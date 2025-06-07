@@ -15,7 +15,7 @@ import {
   Relation,
   Unique,
 } from 'typeorm';
-import { ResumeAnalysisLogEntity } from './resume-analysis-log.entity';
+import { ResumeAnalysisEntity } from './resume-analysis.entity';
 
 @Entity('application', { schema: 'public' })
 @Unique('UQ_candidate_id_job_id', ['candidateId', 'jobId'])
@@ -107,6 +107,6 @@ export class ApplicationEntity extends AbstractEntity {
   })
   referrer?: Relation<UserEntity>;
 
-  @OneToOne(() => ResumeAnalysisLogEntity, (log) => log.application)
-  resumeLog: ResumeAnalysisLogEntity;
+  @OneToOne(() => ResumeAnalysisEntity, (log) => log.application)
+  resumeLog: ResumeAnalysisEntity;
 }

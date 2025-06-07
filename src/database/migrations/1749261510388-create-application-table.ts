@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateApplicationTable1747334902005 implements MigrationInterface {
-  name = 'CreateApplicationTable1747334902005';
+export class CreateApplicationTable1749261510388 implements MigrationInterface {
+  name = 'CreateApplicationTable1749261510388';
   tableName = 'application';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -11,17 +11,19 @@ export class CreateApplicationTable1747334902005 implements MigrationInterface {
         "organization_id" uuid DEFAULT NULL,
         "candidate_id" uuid NOT NULL,
         "job_id" uuid NOT NULL,
-        "source" character varying DEFAULT NULL,
+        "current_stage_id" uuid NOT NULL,
+        "source" character varying(20) DEFAULT NULL,
         "resume" jsonb NOT NULL,
         "raw_resume_text" text DEFAULT NULL,
         "screening_score" float DEFAULT 0,
         "screening_note" text DEFAULT NULL,
         "final_score" float DEFAULT NULL,
         "score_resume_match" integer DEFAULT NULL,
-        "current_stage" character varying DEFAULT NULL,
-        "status" character varying DEFAULT NULL,
-        "expected_salary" decimal DEFAULT NULL,
+        "status" character varying(20) DEFAULT NULL,
+        "expected_salary" jsonb DEFAULT NULL,
+        "cover_letter" text DEFAULT NULL,
         "referred_by" character varying DEFAULT NULL,
+        "applied_by_user_id" uuid DEFAULT NULL,
         "applied_at" TIMESTAMP WITH TIME ZONE DEFAULT now(),
         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
@@ -52,11 +54,30 @@ export class CreateApplicationTable1747334902005 implements MigrationInterface {
     `);
 
     await queryRunner.query(`
+      ALTER TABLE "${this.tableName}"
+      ADD CONSTRAINT "FK_application_current_stage_id"
+      FOREIGN KEY ("current_stage_id") REFERENCES "stage"("id")
+      ON DELETE NO ACTION ON UPDATE NO ACTION
+    `);
+
+    await queryRunner.query(`
+      ALTER TABLE "${this.tableName}"
+      ADD CONSTRAINT "FK_application_applied_by_user_id"
+      FOREIGN KEY ("applied_by_user_id") REFERENCES "user"("id")
+      ON DELETE SET NULL ON UPDATE NO ACTION
+    `);
+
+    await queryRunner.query(`
       CREATE INDEX "IDX_application_candidate_id" ON "${this.tableName}" ("candidate_id")
     `);
 
     await queryRunner.query(`
       CREATE INDEX "IDX_application_job_id" ON "${this.tableName}" ("job_id")
+    `);
+
+    await queryRunner.query(`
+      CREATE INDEX "IDX_application_current_stage_id"
+      ON "${this.tableName}"("current_stage_id")
     `);
 
     await queryRunner.query(`
@@ -72,6 +93,18 @@ export class CreateApplicationTable1747334902005 implements MigrationInterface {
 
     await queryRunner.query(`
       DROP INDEX IF EXISTS "IDX_application_candidate_id"
+    `);
+
+    await queryRunner.query(`
+      DROP INDEX IF EXISTS "IDX_application_current_stage_id"
+    `);
+
+    await queryRunner.query(`
+      ALTER TABLE "${this.tableName}" DROP CONSTRAINT IF EXISTS "FK_application_current_stage_id"
+    `);
+
+    await queryRunner.query(`
+      ALTER TABLE "${this.tableName}" DROP CONSTRAINT IF EXISTS "FK_application_applied_by_user_id"
     `);
 
     await queryRunner.query(`

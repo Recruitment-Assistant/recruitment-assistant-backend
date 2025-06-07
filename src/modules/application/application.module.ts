@@ -10,7 +10,7 @@ import { ApplicationService } from './application.service';
 import { RESUME_ANALYZER_PORT, RESUME_PARSER_PORT } from './constants';
 import { ApplicationController } from './controllers/application.controller';
 import { ApplicationEntity } from './entities/application.entity';
-import { ResumeAnalysisLogEntity } from './entities/resume-analysis-log.entity';
+import { ResumeAnalysisEntity } from './entities/resume-analysis.entity';
 import { ApplicationRepository } from './repositories/application.repository';
 import { ResumeAnalysisLogRepository } from './repositories/resume-analysis-log.repository';
 import { UploadResumeByJobIdUseCase } from './use-cases/upload-resume-by-job-id.use-case';
@@ -43,7 +43,7 @@ const providers = [
 @Module({
   imports: [
     LlmModule,
-    TypeOrmModule.forFeature([ApplicationEntity, ResumeAnalysisLogEntity]),
+    TypeOrmModule.forFeature([ApplicationEntity, ResumeAnalysisEntity]),
     CandidateModule,
     FileModule,
   ],

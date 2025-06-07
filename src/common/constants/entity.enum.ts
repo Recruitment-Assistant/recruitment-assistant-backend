@@ -5,8 +5,8 @@ export enum ROLE {
 }
 
 export enum GENDER {
-  MALE = 0,
-  FEMALE = 1,
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
 }
 
 export enum ROLE_SCOPE {

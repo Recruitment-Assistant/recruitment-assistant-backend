@@ -22,7 +22,7 @@ import { RESUME_ANALYZER_PORT, RESUME_PARSER_PORT } from './constants';
 import { generateJDtext } from './constants/prompt-analysis-resume.constant';
 import { FilterApplicationDto } from './dto/filter-application.dto';
 import { ApplicationEntity } from './entities/application.entity';
-import { ResumeAnalysisLogEntity } from './entities/resume-analysis-log.entity';
+import { ResumeAnalysisEntity } from './entities/resume-analysis.entity';
 import { ResumeAnalyzerPort } from './ports/resume-analyzer.port';
 import { ResumeParserPort } from './ports/resume-parser.port';
 import { ApplicationRepository } from './repositories/application.repository';
@@ -38,7 +38,7 @@ export class ApplicationService {
   constructor(
     private readonly candidateRepository: CandidateRepository,
     private readonly applicationRepository: ApplicationRepository,
-    private readonly resumeLogRepository: ResumeAnalysisLogRepository,
+    private readonly resumeAnalysisRepository: ResumeAnalysisLogRepository,
     private readonly eventService: EventService,
     @Inject(RESUME_PARSER_PORT)
     private readonly parser: ResumeParserPort,
@@ -136,8 +136,8 @@ export class ApplicationService {
       { conflictPaths: ['candidateId', 'jobId'] },
     );
 
-    await this.resumeLogRepository.save(
-      new ResumeAnalysisLogEntity({
+    await this.resumeAnalysisRepository.save(
+      new ResumeAnalysisEntity({
         applicationId: applicationSaved.identifiers[0].id as Uuid,
         aiSummary: analysisResult.ai_summary,
         selected: analysisResult.selected,

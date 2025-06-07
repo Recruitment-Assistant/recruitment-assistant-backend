@@ -10,15 +10,15 @@ import {
 } from 'typeorm';
 import { ApplicationEntity } from './application.entity';
 
-@Entity('resume_analysis_log', { schema: 'public' })
-export class ResumeAnalysisLogEntity extends AbstractEntity {
-  constructor(data?: Partial<ResumeAnalysisLogEntity>) {
+@Entity('resume_analysis', { schema: 'public' })
+export class ResumeAnalysisEntity extends AbstractEntity {
+  constructor(data?: Partial<ResumeAnalysisEntity>) {
     super();
     Object.assign(this, data);
   }
 
   @PrimaryGeneratedColumn('uuid', {
-    primaryKeyConstraintName: 'PK_resume_analysis_log_id',
+    primaryKeyConstraintName: 'PK_resume_analysis_id',
   })
   id!: Uuid;
 
@@ -65,7 +65,7 @@ export class ResumeAnalysisLogEntity extends AbstractEntity {
   @JoinColumn({
     name: 'application_id',
     referencedColumnName: 'id',
-    foreignKeyConstraintName: 'FK_resume_analysis_log_application_id',
+    foreignKeyConstraintName: 'FK_resume_analysis_application_id',
   })
   application!: Relation<ApplicationEntity>;
 }

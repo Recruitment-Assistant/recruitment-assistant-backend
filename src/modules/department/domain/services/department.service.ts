@@ -40,8 +40,8 @@ export class DepartmentService {
 
     Optional.of(
       await this.repository.findOneByCondition({
-        code: dto.code,
-        organizationId: dto.organizationId,
+        code: dto.code || department.code,
+        organizationId: dto.organizationId || department.organizationId,
         id: Not(id),
       }),
     ).throwIfPresent(new ConflictException('Department already exists'));

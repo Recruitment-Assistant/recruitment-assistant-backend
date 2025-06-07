@@ -32,7 +32,6 @@ export class UserResDto extends BaseResDto {
 
   @StringField()
   @Expose()
-  @Transform(({ value }) => (value === 0 ? 'MALE' : 'FEMALE'))
   gender: string;
 
   @StringField({ isArray: true, each: true })

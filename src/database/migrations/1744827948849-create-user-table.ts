@@ -13,7 +13,7 @@ export class CreateUserTable1744827948849 implements MigrationInterface {
         "name" character varying NOT NULL,
         "avatar" character varying DEFAULT NULL,
         "date_of_birth" date DEFAULT NULL,
-        "gender" integer DEFAULT 0, -- 0 = Male, 1 = Female
+        "gender" character varying(10) DEFAULT NULL,
         "is_active" boolean DEFAULT false,
         "is_confirmed" boolean DEFAULT false,
         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
