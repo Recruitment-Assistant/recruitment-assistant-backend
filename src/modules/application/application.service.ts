@@ -5,6 +5,7 @@ import { ICurrentUser } from '@common/interfaces';
 import { Uuid } from '@common/types/common.type';
 import { FileEntity } from '@database/entities/file.entity';
 import { AnalysisResumeCommand } from '@modules/application/commands/analysis-resume.command';
+import { CANDIDATE_SOURCE } from '@modules/candidate/constant';
 import { CandidateEntity } from '@modules/candidate/entities/candidate.entity';
 import { CandidateRepository } from '@modules/candidate/repositories/candidate.repository';
 import { FileInfoResDto } from '@modules/file/dto/file-info.res.dto';
@@ -18,7 +19,11 @@ import * as fs from 'fs';
 import PdfParse from 'pdf-parse';
 import { Observable, Subject } from 'rxjs';
 import { FindManyOptions, In } from 'typeorm';
-import { RESUME_ANALYZER_PORT, RESUME_PARSER_PORT } from './constants';
+import {
+  APPLICATION_STATUS,
+  RESUME_ANALYZER_PORT,
+  RESUME_PARSER_PORT,
+} from './constants';
 import { generateJDtext } from './constants/prompt-analysis-resume.constant';
 import { FilterApplicationDto } from './dto/filter-application.dto';
 import { ApplicationEntity } from './entities/application.entity';
@@ -129,8 +134,8 @@ export class ApplicationService {
         scoreResumeMatch: analysisResult.score_resume_match,
         screeningNote: analysisResult.feedback,
         appliedAt: new Date(),
-        source: 'UPLOAD',
-        status: 'NEW',
+        source: CANDIDATE_SOURCE.UPLOAD,
+        status: APPLICATION_STATUS.ACTIVE,
         // currentStage: 'SCREENING',
       }),
       { conflictPaths: ['candidateId', 'jobId'] },

@@ -1,6 +1,9 @@
+import { CurrentOrganizationId } from '@common/decorators/current-organization.decorator';
 import { ApiAuth } from '@common/decorators/http.decorators';
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ValidateUuid } from '@common/decorators/validators/uuid-validator';
+import { Uuid } from '@common/types/common.type';
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { PipelineResDto } from './dto/pipeline.res.dto';
 import { PipelineService } from './pipeline.service';
 
@@ -16,12 +19,21 @@ export class PipelineController {
     type: PipelineResDto,
     isArray: true,
   })
-  async getAllPipeline() {}
+  async getAllPipeline(@CurrentOrganizationId() organizationId: Uuid) {
+    return this.pipelineService.getAllPipelineByOrganizationId(organizationId);
+  }
 
   @Get(':pipelineId')
   @ApiAuth({
     summary: 'Get pipeline by id',
     type: PipelineResDto,
   })
-  async getPipeline() {}
+  @ApiParam({
+    name: 'pipelineId',
+    description: 'Pipeline id',
+    type: 'string',
+  })
+  async getPipeline(@Param('pipelineId', ValidateUuid) pipelineId: Uuid) {
+    return this.pipelineService.getPipelineById(pipelineId);
+  }
 }

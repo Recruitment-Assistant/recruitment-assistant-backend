@@ -1,14 +1,13 @@
 import { JOB_STATUS } from '@common/constants/entity.enum';
-import { ErrorCode } from '@common/constants/error-code';
 import { ApiPublic } from '@common/decorators/http.decorators';
 import { Public } from '@common/decorators/public.decorator';
 import { UploadFileDecorator } from '@common/decorators/upload-file.decorator';
 import { ValidateUuid } from '@common/decorators/validators/uuid-validator';
 import { OffsetPaginatedDto } from '@common/dto/offset-pagination/paginated.dto';
-import { ValidationException } from '@common/exceptions/validation.exception';
 import { Uuid } from '@common/types/common.type';
 import { ApplyJobCommand } from '@modules/application/commands/apply-job.command';
 import { ApplyJobDto } from '@modules/application/dto/apply.job.dto';
+import { MulterHandler } from '@modules/file/handlers/multer.handler';
 import { JobMapper } from '@modules/job/application/mappers/job.mapper';
 import { JobService } from '@modules/job/domain/services/job.service';
 import { FilterJobDto } from '@modules/job/presentation/dto/request/filter-job.dto';
@@ -27,9 +26,6 @@ import {
 import { CommandBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import path, { extname } from 'path';
-import { v4 as uuidv4 } from 'uuid';
 
 @Controller({ path: '/public/jobs', version: '1' })
 @ApiTags('Job Public APIs')
@@ -86,35 +82,22 @@ export class JobPublicController {
   })
   @UploadFileDecorator()
   @UseInterceptors(
-    FileInterceptor('resume', {
-      storage: diskStorage({
-        destination: './src/uploads',
-        filename: (_req, file, cb) => {
-          const fileName = `${uuidv4()}${extname(file.originalname)}`;
-          cb(null, fileName);
-        },
-      }),
-      fileFilter: (req, file, cb) => {
-        if (
-          !['.pdf'].includes(
-            path.extname(file.originalname).toLocaleLowerCase(),
-          )
-        ) {
-          cb(
-            new ValidationException(ErrorCode.COMMON, 'Only support pdf file'),
-            false,
-          );
-        }
-
-        cb(null, true);
-      },
-    }),
+    FileInterceptor(
+      'resume',
+      new MulterHandler(
+        ['.pdf'],
+        './src/uploads',
+        10 * 1024 * 1024,
+      ).configurations(),
+    ),
   )
   applyJob(
     @Param('jobId', ValidateUuid) jobId: Uuid,
     @Body() dto: ApplyJobDto,
+    @Body('expected_salary') expected_salary: string,
     @UploadedFile() resume: Express.Multer.File,
   ) {
+    dto.expected_salary = JSON.parse(expected_salary);
     this.commandBus.execute(new ApplyJobCommand(jobId, dto, resume));
   }
 }

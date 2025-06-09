@@ -1,6 +1,7 @@
 import { Uuid } from '@common/types/common.type';
 import { AbstractEntity } from '@database/entities/abstract.entity';
 import { FileEntity } from '@database/entities/file.entity';
+import { CANDIDATE_SOURCE } from '@modules/candidate/constant';
 import { CandidateEntity } from '@modules/candidate/entities/candidate.entity';
 import { JobEntity } from '@modules/job/infrastructure/database/entities/job.entity';
 import { OrganizationEntity } from '@modules/organization/entities/organization.entity';
@@ -16,6 +17,7 @@ import {
   Relation,
   Unique,
 } from 'typeorm';
+import { APPLICATION_STATUS } from '../constants';
 import { ResumeAnalysisEntity } from './resume-analysis.entity';
 
 @Entity('application', { schema: 'public' })
@@ -41,10 +43,13 @@ export class ApplicationEntity extends AbstractEntity {
   jobId!: Uuid;
 
   @Column('varchar', { nullable: true })
-  source?: string;
+  source?: CANDIDATE_SOURCE;
 
   @Column('jsonb', { name: 'resume' })
   resume!: FileEntity;
+
+  @Column('text', { name: 'cover_letter', nullable: true })
+  coverLetter?: string;
 
   @Column('text', { name: 'raw_resume_text', nullable: true })
   rawResumeText?: string;
@@ -65,7 +70,7 @@ export class ApplicationEntity extends AbstractEntity {
   currentStageId?: Uuid;
 
   @Column('varchar', { nullable: true })
-  status?: string;
+  status?: APPLICATION_STATUS;
 
   @Column('jsonb', { name: 'expected_salary', nullable: true })
   expectedSalary?: Record<string, any>;

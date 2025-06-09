@@ -1,3 +1,4 @@
+import { GENDER } from '@common/constants/entity.enum';
 import {
   EnumFieldOptional,
   StringField,
@@ -6,7 +7,7 @@ import {
 import { Uuid } from '@common/types/common.type';
 import { FileEntity } from '@database/entities/file.entity';
 import { Expose } from 'class-transformer';
-import { CANDIDATE_SOURCE, GENDER_CANDIDATE } from '../constant';
+import { CANDIDATE_SOURCE } from '../constant';
 
 @Expose()
 export class CreateCandidateDto {
@@ -30,7 +31,7 @@ export class CreateCandidateDto {
   @Expose()
   address?: string;
 
-  @EnumFieldOptional(() => GENDER_CANDIDATE)
+  @EnumFieldOptional(() => GENDER)
   @Expose()
   gender?: string;
 

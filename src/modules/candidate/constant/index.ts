@@ -1,8 +1,3 @@
-export enum GENDER_CANDIDATE {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-}
-
 export enum CANDIDATE_SOURCE {
   UPLOAD = 'UPLOAD',
   LINKEDIN = 'LINKEDIN',

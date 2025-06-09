@@ -6,6 +6,7 @@ import {
   EnumField,
   NumberField,
   StringField,
+  UUIDField,
   UUIDFieldOptional,
 } from '@common/decorators/field.decorators';
 import { Uuid } from '@common/types/common.type';
@@ -65,6 +66,14 @@ export class CreateJobDto {
   @UUIDFieldOptional({ name: 'department_id', default: null })
   @Expose({ name: 'department_id' })
   departmentId?: Uuid;
+
+  @UUIDField()
+  @Expose()
+  pipeline_id: Uuid;
+
+  @BooleanFieldOptional()
+  @Expose()
+  is_draft: boolean;
 
   organizationId: Uuid;
 

@@ -4,14 +4,18 @@ import { ApplicationService } from '@modules/application/application.service';
 import { ApplyJobDto } from '@modules/application/dto/apply.job.dto';
 import { ApplicationRepository } from '@modules/application/repositories/application.repository';
 import { ResumeAnalysisLogRepository } from '@modules/application/repositories/resume-analysis-log.repository';
+import { CANDIDATE_SOURCE } from '@modules/candidate/constant';
 import { CandidateEntity } from '@modules/candidate/entities/candidate.entity';
 import { CandidateRepository } from '@modules/candidate/repositories/candidate.repository';
 import { FileService } from '@modules/file/file.service';
 import { Job } from '@modules/job/domain/entities/job';
 import { GetJobByIdEvent } from '@modules/job/domain/events/get-job-by-id.event';
+import { PipelineEntity } from '@modules/pipeline/entities/pipeline.entity';
+import { GetPipelineEvent } from '@modules/pipeline/events/get-pipeline.event';
 import { Injectable } from '@nestjs/common';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import fs from 'fs';
+import { APPLICATION_STATUS } from '../constants';
 import { ApplicationEntity } from '../entities/application.entity';
 import { ResumeAnalysisEntity } from '../entities/resume-analysis.entity';
 import { IPayloadCreateApplication } from '../types';
@@ -71,6 +75,8 @@ export class ApplyJobCommandHandler
         resume: candidate.resume,
         organizationId: dto.organizationId,
         candidateId: candidate.id,
+        job,
+        dto,
       });
     } catch (error) {
       console.error('Error applying for job:', error);
@@ -140,7 +146,15 @@ export class ApplyJobCommandHandler
       resume,
       organizationId,
       candidateId,
+      job,
+      dto,
     } = payload;
+
+    const pipeline: PipelineEntity = await this.eventService.emitAsync(
+      new GetPipelineEvent(job.pipeline_id),
+    );
+
+    const firstStage = pipeline.stages[0];
 
     const applicationSaved = await this.applicationRepository.upsert(
       new ApplicationEntity({
@@ -153,9 +167,11 @@ export class ApplyJobCommandHandler
         scoreResumeMatch: analysisResult.score_resume_match,
         screeningNote: analysisResult.feedback,
         appliedAt: new Date(),
-        source: 'UPLOAD',
-        status: 'NEW',
-        // currentStage: 'SCREENING',
+        source: CANDIDATE_SOURCE.UPLOAD,
+        status: APPLICATION_STATUS.ACTIVE,
+        currentStageId: firstStage.id,
+        coverLetter: dto.cover_letter,
+        expectedSalary: dto.expected_salary,
       }),
       { conflictPaths: ['candidateId', 'jobId'] },
     );

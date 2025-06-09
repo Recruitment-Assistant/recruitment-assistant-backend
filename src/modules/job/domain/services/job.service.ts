@@ -28,6 +28,12 @@ export class JobService {
     }
 
     const job = new Job(dto);
+    if (dto.is_draft) {
+      job.status = JOB_STATUS.DRAFT;
+    } else {
+      job.status = JOB_STATUS.OPENING;
+      job.publishedAt = new Date();
+    }
     return this.jobRepository.save(job);
   }
 

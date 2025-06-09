@@ -1,6 +1,5 @@
 import { PHONE_NUMBER_FORMAT } from '@common/constants/app.constant';
 import {
-  ClassFieldOptional,
   EmailField,
   EnumFieldOptional,
   NumberFieldOptional,
@@ -38,7 +37,7 @@ export class ApplyJobDto {
   @Matches(PHONE_NUMBER_FORMAT, { message: 'Phone number invalid' })
   phone_number: string;
 
-  @ClassFieldOptional(() => ExpectedSalaryDto)
+  // @ClassFieldOptional(() => ExpectedSalaryDto)
   expected_salary?: ExpectedSalaryDto;
 
   @StringFieldOptional()
