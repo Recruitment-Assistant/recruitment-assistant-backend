@@ -83,7 +83,7 @@ export class JobController {
   }
 
   @Get(':jobId')
-  @ApiAuth({
+  @ApiPublic({
     summary: 'Get job by id',
     description: 'Get job by id',
     type: JobResDto,

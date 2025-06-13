@@ -77,6 +77,8 @@ export class JobRepository implements IJobRepository {
       );
     }
 
+    queryBuilder.take(filter.limit).skip(filter.offset);
+
     const [entities, total] = await queryBuilder.getManyAndCount();
     const meta = new OffsetPaginationDto(total, filter);
     return new OffsetPaginatedDto(entities.map(JobMapper.toDomain), meta);
