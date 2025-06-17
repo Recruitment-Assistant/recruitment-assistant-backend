@@ -57,6 +57,10 @@ export class JobResDto extends BaseResDto {
   @Expose()
   quantity: number = 1;
 
+  @NumberField({ default: 0 })
+  @Expose()
+  applied_count: number = 0;
+
   @BooleanFieldOptional({ default: false, name: 'remote_eligible' })
   @Expose()
   remoteEligible: boolean = false;

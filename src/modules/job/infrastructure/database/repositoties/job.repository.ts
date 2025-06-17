@@ -65,7 +65,15 @@ export class JobRepository implements IJobRepository {
       .createQueryBuilder('job')
       .leftJoinAndSelect('job.organization', 'organization')
       .leftJoinAndSelect('job.department', 'department')
-      .leftJoinAndSelect('job.creator', 'creator');
+      .leftJoinAndSelect('job.creator', 'creator')
+      .leftJoinAndSelect('job.applications', 'applications')
+      .select([
+        'job',
+        'organization',
+        'department',
+        'creator',
+        'applications.id',
+      ]);
 
     if (filter.status) {
       queryBuilder.andWhere('job.status IN (:...status)', {

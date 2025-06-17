@@ -39,6 +39,8 @@ export class Job extends BaseEntity {
 
   quantity: number = 1;
 
+  applied_count: number = 0;
+
   remoteEligible: boolean = false;
 
   employmentType!: EMPLOYMENT_TYPE;

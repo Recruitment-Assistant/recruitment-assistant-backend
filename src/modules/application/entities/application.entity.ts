@@ -97,7 +97,9 @@ export class ApplicationEntity extends AbstractEntity {
   })
   candidate!: Relation<CandidateEntity>;
 
-  @ManyToOne(() => JobEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => JobEntity, (job) => job.applications, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({
     name: 'job_id',
     referencedColumnName: 'id',

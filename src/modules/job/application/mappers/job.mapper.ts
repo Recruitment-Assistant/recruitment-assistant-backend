@@ -45,6 +45,11 @@ export class JobMapper implements Mapper<Job> {
     if (entity.pipeline) {
       job.pipeline = entity.pipeline;
     }
+
+    if (entity.applications && entity.applications.length > 0) {
+      job.applied_count = entity.applications.length;
+    }
+
     return job;
   }
 

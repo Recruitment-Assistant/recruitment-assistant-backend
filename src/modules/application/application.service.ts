@@ -3,6 +3,7 @@ import { OffsetPaginatedDto } from '@common/dto/offset-pagination/paginated.dto'
 import { EventService } from '@common/events/event.service';
 import { ICurrentUser } from '@common/interfaces';
 import { Uuid } from '@common/types/common.type';
+import { Optional } from '@common/utils/optional';
 import { FileEntity } from '@database/entities/file.entity';
 import { AnalysisResumeCommand } from '@modules/application/commands/analysis-resume.command';
 import { CANDIDATE_SOURCE } from '@modules/candidate/constant';
@@ -13,7 +14,7 @@ import { FileService } from '@modules/file/file.service';
 import { Job } from '@modules/job/domain/entities/job';
 import { GetJobByIdEvent } from '@modules/job/domain/events/get-job-by-id.event';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { Cache } from 'cache-manager';
 import * as fs from 'fs';
 import PdfParse from 'pdf-parse';
@@ -230,8 +231,7 @@ export class ApplicationService {
     const filterOptions: FindManyOptions<ApplicationEntity> = {
       where: {
         organizationId: query.ogranizationId,
-        // id: query.id ? In(query.id) : undefined,
-        jobId: query.jobId ? In(query.jobId) : undefined,
+        jobId: query.job_id ? In(query.job_id) : undefined,
       },
     };
 
@@ -250,5 +250,19 @@ export class ApplicationService {
 
     const meta = new OffsetPaginationDto(totalRecords, query);
     return new OffsetPaginatedDto(applications, meta);
+  }
+
+  async getApplicationById(applicationId: Uuid) {
+    return Optional.of(
+      await this.applicationRepository.findOne({
+        where: { id: applicationId },
+        relations: {
+          candidate: true,
+          resumeLog: true,
+        },
+      }),
+    )
+      .throwIfNotPresent(new NotFoundException('Application not found'))
+      .get<ApplicationEntity>();
   }
 }

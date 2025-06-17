@@ -3,6 +3,7 @@ import { Uuid } from '@/common/types/common.type';
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { OrganizationEntity } from '@/modules/organization/entities/organization.entity';
 import { UserEntity } from '@/modules/user/entities/user.entity';
+import { ApplicationEntity } from '@modules/application/entities/application.entity';
 import { DepartmentEntity } from '@modules/department/infrastructure/database/entities/department.entity';
 import { PipelineEntity } from '@modules/pipeline/entities/pipeline.entity';
 import {
@@ -10,6 +11,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
@@ -105,4 +107,7 @@ export class JobEntity extends AbstractEntity {
     foreignKeyConstraintName: 'FK_job_created_by',
   })
   creator!: UserEntity;
+
+  @OneToMany(() => ApplicationEntity, (application) => application.job)
+  applications?: ApplicationEntity[];
 }

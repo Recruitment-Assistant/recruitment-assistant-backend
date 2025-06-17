@@ -11,6 +11,7 @@ import { RESUME_ANALYZER_PORT, RESUME_PARSER_PORT } from './constants';
 import { ApplicationController } from './controllers/application.controller';
 import { ApplicationEntity } from './entities/application.entity';
 import { ResumeAnalysisEntity } from './entities/resume-analysis.entity';
+import { FilterApplicationHandler } from './queries/filter-application.query';
 import { ApplicationRepository } from './repositories/application.repository';
 import { ResumeAnalysisLogRepository } from './repositories/resume-analysis-log.repository';
 import { UploadResumeByJobIdUseCase } from './use-cases/upload-resume-by-job-id.use-case';
@@ -21,6 +22,9 @@ const providers = [
 
   // commands
   ApplyJobCommandHandler,
+
+  // queries
+  FilterApplicationHandler,
 
   // services
   ApplicationService,

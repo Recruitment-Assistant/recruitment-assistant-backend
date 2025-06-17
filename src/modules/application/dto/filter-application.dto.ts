@@ -12,20 +12,29 @@ export class FilterApplicationDto extends PageOptionsDto {
   @Transform(({ value }) =>
     value && typeof value === 'string' ? [value] : value,
   )
-  id?: string[];
+  id?: Uuid[];
 
   @StringFieldOptional({
     each: true,
     isArray: true,
-    name: 'job_id',
     uniqueItems: true,
   })
-  @Expose({ name: 'job_id' })
   @IsUUID('4', { each: true })
   @Transform(({ value }) =>
     value && typeof value === 'string' ? [value] : value,
   )
-  jobId?: Uuid[];
+  job_id?: Uuid[];
+
+  @StringFieldOptional({
+    each: true,
+    isArray: true,
+    uniqueItems: true,
+  })
+  @IsUUID('4', { each: true })
+  @Transform(({ value }) =>
+    value && typeof value === 'string' ? [value] : value,
+  )
+  stage_id?: Uuid[];
 
   ogranizationId?: Uuid;
 }
