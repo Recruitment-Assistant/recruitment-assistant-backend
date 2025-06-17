@@ -27,7 +27,21 @@ export class JobRepository implements IJobRepository {
   async findById(id: Uuid): Promise<Job | null> {
     const entity = await this.repository.findOne({
       where: { id },
-      relations: ['organization', 'department', 'creator'],
+      relations: {
+        organization: true,
+        department: true,
+        creator: true,
+        pipeline: {
+          stages: true,
+        },
+      },
+      order: {
+        pipeline: {
+          stages: {
+            stage_order: 'ASC',
+          },
+        },
+      },
     });
     return entity ? JobMapper.toDomain(entity) : null;
   }

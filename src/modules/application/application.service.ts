@@ -242,6 +242,7 @@ export class ApplicationService {
     filterOptions.relations = {
       candidate: true,
       resumeLog: true,
+      job: true,
     };
 
     const [applications, totalRecords] =

@@ -7,12 +7,14 @@ import {
   NumberField,
   StringField,
   StringFieldOptional,
+  UUIDField,
   UUIDFieldOptional,
 } from '@common/decorators/field.decorators';
 import { BaseResDto } from '@common/dto/base.res.dto';
 import { Uuid } from '@common/types/common.type';
 import { DepartmentResDto } from '@modules/department/presentation/dto/response/department.res.dto';
 import { OrganizationResDto } from '@modules/organization/dto/response/organization.res.dto';
+import { PipelineResDto } from '@modules/pipeline/dto/pipeline.res.dto';
 import { BaseUserResDto } from '@shared/dto/base-user.res.dto';
 import { Expose } from 'class-transformer';
 import { SalaryRangeDto } from '../salary-range.dto';
@@ -71,6 +73,10 @@ export class JobResDto extends BaseResDto {
   @Expose()
   departmentId?: Uuid;
 
+  @UUIDField()
+  @Expose()
+  pipeline_id: Uuid;
+
   @UUIDFieldOptional({ name: 'organization_id' })
   @Expose()
   organizationId: Uuid;
@@ -90,4 +96,8 @@ export class JobResDto extends BaseResDto {
   @ClassFieldOptional(() => BaseUserResDto)
   @Expose()
   creator: BaseUserResDto;
+
+  @ClassFieldOptional(() => PipelineResDto)
+  @Expose()
+  pipeline: PipelineResDto;
 }

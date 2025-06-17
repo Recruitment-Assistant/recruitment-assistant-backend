@@ -42,6 +42,9 @@ export class JobMapper implements Mapper<Job> {
       job.department = DepartmentMapper.toDomain(entity.department);
     }
 
+    if (entity.pipeline) {
+      job.pipeline = entity.pipeline;
+    }
     return job;
   }
 

@@ -3,6 +3,7 @@ import { Department } from '@/modules/department/domain/entities/department';
 import { UserEntity } from '@/modules/user/entities/user.entity';
 import { Uuid } from '@common/types/common.type';
 import { OrganizationEntity } from '@modules/organization/entities/organization.entity';
+import { PipelineEntity } from '@modules/pipeline/entities/pipeline.entity';
 import { BaseEntity } from '@shared/entities/base-entity';
 
 export interface SalaryRange {
@@ -57,4 +58,6 @@ export class Job extends BaseEntity {
   department?: Department;
 
   creator?: UserEntity;
+
+  pipeline: PipelineEntity;
 }
